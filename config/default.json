@@ -1,0 +1,5 @@
+{
+  "port": 5001,
+  "mongoUri": "mongodb+srv://eg-bond:12345qwerty@untitledcluster-mbqds.mongodb.net/app?retryWrites=true&w=majority",
+  "jwtSecret": "UntitledSecret"
+}
