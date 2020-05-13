@@ -5,10 +5,8 @@ import {getAuthData} from "../../redux/authReduser";
 const IndexPage = ({name, lastname, getAuthData}) => {
 
     const getUserId = () => {
-        debugger;
         const token = JSON.parse(localStorage.getItem('userData'))
         getAuthData(token)
-
     }
 
     return (

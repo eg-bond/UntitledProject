@@ -57,9 +57,16 @@ export const setAuthData = (token, userId, name, lastname, nickname, email) => {
 }
 export const getAuthData = (token) => {
     return async (dispatch) => {
-        let authData = await authAPI.me(token)
         dispatch(fetchInProgress(true))
-        dispatch(setAuthData(authData.token, authData.userId, authData.name, authData.lastname, authData.nickname, authData.email))
+
+        let authData = await authAPI.me(token)
+
+        if (authData.userId) {
+            dispatch(setAuthData(authData.token, authData.userId, authData.name, authData.lastname, authData.nickname, authData.email))
+        } else {
+            localStorage.removeItem('userData')
+        }
+
         dispatch(fetchInProgress(false))
     }
 }
@@ -68,11 +75,17 @@ export const login = (formData) => {
     return async (dispatch) => {
         let allAuthData = await authAPI.login(formData)
 
-        localStorage.setItem('userData', JSON.stringify({
-            token: allAuthData.token
-        }));
+        if (allAuthData.token) {
+            localStorage.setItem('userData', JSON.stringify({
+                token: allAuthData.token
+            }));
 
-        dispatch(setAuthData(allAuthData.token, allAuthData.userId, allAuthData.name, allAuthData.lastname, allAuthData.nickname, allAuthData.email))
+            dispatch(setAuthData(allAuthData.token, allAuthData.userId, allAuthData.name, allAuthData.lastname, allAuthData.nickname, allAuthData.email))
+        } else {
+            if (window.M && allAuthData.message) {
+                window.M.toast({html: allAuthData.message}); //.toast это метод Материалайза, который выводит плашку с текстом на экран
+            }
+        }
     }
 }
 

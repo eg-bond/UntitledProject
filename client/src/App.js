@@ -23,7 +23,7 @@ const App = ({isAuth, logout, getAuthData, isFetching}) => {
     }
 
     return (
-        <div className="App">
+        <div className="container">
             <Navbar isAuth={isAuth} logout={logout}/>
             <Routes isAuth={isAuth}/>
         </div>

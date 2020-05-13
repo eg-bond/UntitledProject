@@ -100,7 +100,7 @@ router.post(
 // /api/auth/me
 router.post(
     '/me', //эндпоинт
-    async (req, res) => { //функция регистрации, тут пропишем всю логику обработки регистрационной страницы
+    async (req, res) => {
 
         try {
             const {token} = req.body

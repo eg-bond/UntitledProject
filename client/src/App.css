@@ -1,39 +1,44 @@
 @import "~materialize-css/dist/css/materialize.min.css"; /*подключаем стили из materialize-css*/
-.App {
-  text-align: center;
+
+
+/*Auth and registration*/
+.auth__button {
+  width: 100%;
 }
 
-.App-logo {
-  height: 40vmin;
-  pointer-events: none;
+.auth__createLink {
+  padding-top: 1.5rem;
 }
 
-@media (prefers-reduced-motion: no-preference) {
-  .App-logo {
-    animation: App-logo-spin infinite 20s linear;
-  }
+.auth__createLink_a {
+  color: orange;
+  transition: ease-out .2s;
+}
+.auth__createLink_a:hover {
+  color: #ff4810;
 }
 
-.App-header {
-  background-color: #282c34;
-  min-height: 100vh;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-  font-size: calc(10px + 2vmin);
+
+.input-field input {
   color: white;
 }
 
-.App-link {
-  color: #61dafb;
+/* label focus color */
+.orange-input {
+  border-bottom: #fff !important;
+  box-shadow: 0 1px 0 0 #fff !important;
 }
 
-@keyframes App-logo-spin {
-  from {
-    transform: rotate(0deg);
-  }
-  to {
-    transform: rotate(360deg);
-  }
+.orange-input + label {
+  color: #ffffff !important;
 }
+
+.orange-input:focus + label {
+  color: orange !important;
+}
+
+.orange-input:focus {
+  border-bottom: orange !important;
+  box-shadow: 0 1px 0 0 orange !important;
+}
+
