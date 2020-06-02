@@ -12,7 +12,6 @@ let initialState = {
     name: null,
     lastname: null,
     nickname: null,
-    token: null,
     isAuth: false,
     isFetching: false
 }
@@ -39,7 +38,6 @@ export const authReduser = (state = initialState, action) => {
                 name: null,
                 lastname: null,
                 nickname: null,
-                token: null,
                 isAuth: false
             }
 
@@ -49,10 +47,10 @@ export const authReduser = (state = initialState, action) => {
 }
 
 export const fetchInProgress = (inProgress) => ({type: FETCH_IN_PROGRESS, inProgress})
-export const setAuthData = (token, userId, name, lastname, nickname, email) => {
+export const setAuthData = (userId, name, lastname, nickname, email) => {
     return {
         type: SET_AUTH_DATA,
-        loginData: {token, userId, name, lastname, nickname, email}
+        loginData: {userId, name, lastname, nickname, email}
     }
 }
 export const getAuthData = (token) => {
@@ -62,7 +60,7 @@ export const getAuthData = (token) => {
         let authData = await authAPI.me(token)
 
         if (authData.userId) {
-            dispatch(setAuthData(authData.token, authData.userId, authData.name, authData.lastname, authData.nickname, authData.email))
+            dispatch(setAuthData(authData.userId, authData.name, authData.lastname, authData.nickname, authData.email))
         } else {
             localStorage.removeItem('userData')
         }
@@ -76,11 +74,9 @@ export const login = (formData) => {
         let allAuthData = await authAPI.login(formData)
 
         if (allAuthData.token) {
-            localStorage.setItem('userData', JSON.stringify({
-                token: allAuthData.token
-            }));
+            localStorage.setItem('userData', JSON.stringify({token: allAuthData.token}));
 
-            dispatch(setAuthData(allAuthData.token, allAuthData.userId, allAuthData.name, allAuthData.lastname, allAuthData.nickname, allAuthData.email))
+            dispatch(setAuthData(allAuthData.userId, allAuthData.name, allAuthData.lastname, allAuthData.nickname, allAuthData.email))
         } else {
             if (window.M && allAuthData.message) {
                 window.M.toast({html: allAuthData.message}); //.toast это метод Материалайза, который выводит плашку с текстом на экран
