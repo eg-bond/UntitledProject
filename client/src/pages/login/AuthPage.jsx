@@ -8,7 +8,9 @@ import {connect} from "react-redux";
 const AuthPage = ({login}) => {
 
     const onSubmit = (formData) => {
+        console.log(formData)
         login(formData)
+
     }
 
     return (

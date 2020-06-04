@@ -10,6 +10,7 @@ import {Routes} from "./components/Routes";
 
 const App = ({isAuth, logout, getAuthData, isFetching}) => {
 
+    //if token in LS exists - get userData from server
     useEffect(() => {
         const token = JSON.parse(localStorage.getItem('userData'))
         if (!!token) {
