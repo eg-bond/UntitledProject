@@ -89,11 +89,26 @@ router.post(
                 {expiresIn: '1h'}
             );
 
-            res.json({token, userId: user.id, name: user.name, lastname: user.lastname,
-                nickname: user.nickname, email: user.email}) //по умолчанию статус 200, поэтому тут не пишем
+            res.json({
+                statusCode: 0,
+                authData:{
+                    userId: user.id,
+                    name: user.name,
+                    lastname: user.lastname,
+                    nickname: user.nickname,
+                    email: user.email
+                },
+                token,
+                message: null,
+            })
 
         } catch (e) {
-            res.status(500).json({message: 'Что-то пошло не так, попробуйте снова'}) //посмотреть коды ошибок
+            res.status(500).json({
+                statusCode: 1,
+                authData: null,
+                token: null,
+                message: 'Что-то пошло не так, попробуйте снова'
+            })
         }
     });
 
@@ -110,11 +125,22 @@ router.post(
 
             const user = await User.findOne({email})
 
-            res.json({userId: user.id, name: user.name, lastname: user.lastname,
-                nickname: user.nickname, email: user.email}) //по умолчанию статус 200, поэтому тут не пишем
+            res.json({
+                statusCode: 0,
+                authData:{
+                    userId: user.id,
+                    name: user.name,
+                    lastname: user.lastname,
+                    nickname: user.nickname,
+                    email: user.email
+                }
+            })
 
         } catch (e) {
-            res.status(500).json({message: 'Что-то пошло не так, попробуйте снова'}) //посмотреть коды ошибок
+            res.status(500).json({
+                statusCode: 1,
+                authData: null
+            })
         }
     });
 

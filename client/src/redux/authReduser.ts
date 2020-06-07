@@ -1,14 +1,6 @@
 import {authAPI} from "../api/api";
-import {FormAction} from "redux-form";
 import {ThunkAction} from "redux-thunk";
-import {AppStateType} from "./store";
-
-
-const LOGIN = 'LOGIN'
-const LOGOUT = 'LOGOUT'
-const GET_AUTH_DATA = 'GET_AUTH_DATA'
-const SET_AUTH_DATA = 'SET_AUTH_DATA'
-const FETCH_IN_PROGRESS = 'FETCH_IN_PROGRESS'
+import {AppStateType, InferActionsTypes} from "./store";
 
 let initialState = {
     userId: null as string | null,
@@ -52,67 +44,61 @@ export const authReduser = (state = initialState, action: ActionsTypes): Initial
     }
 }
 
-type ActionsTypes = SetAuthDataActionType | FetchInProgressType | LogoutActionType
+type ActionsTypes = InferActionsTypes<typeof actions>
 
+type SetAuthLoginDataActionType = { //дубляж!!!!!!!!!!
+    userId: string,
+    email: string,
+    name: string,
+    lastname: string,
+    nickname: string
+} | null
 
-export type FetchInProgressType = {type: typeof FETCH_IN_PROGRESS, inProgress: boolean}
-export const fetchInProgress = (inProgress: boolean): FetchInProgressType => ({type: FETCH_IN_PROGRESS, inProgress})
-
-//=========================
-type SetAuthLoginDataActionType = {
-    userId: string | null,
-    email: string | null,
-    name: string | null,
-    lastname: string | null,
-    nickname: string | null
+export const actions = {
+    fetchInProgress: (inProgress: boolean) => ({type: "FETCH_IN_PROGRESS", inProgress}) as const,
+    setAuthData: (authData: SetAuthLoginDataActionType) => ({type: "SET_AUTH_DATA", loginData: authData}) as const,
+    logout: () => ({type: "LOGOUT"}) as const
 }
-export type SetAuthDataActionType = {type: typeof SET_AUTH_DATA, loginData: SetAuthLoginDataActionType}
 
-export const setAuthData = (userId: string | null, name: string | null, lastname: string | null,
-                            nickname: string | null, email: string | null): SetAuthDataActionType => {
-    return {
-        type: SET_AUTH_DATA,
-        loginData: {userId, name, lastname, nickname, email}
-    }
-}
-//============================
 
 type ThunkType = ThunkAction<Promise<void>, AppStateType, unknown, ActionsTypes>
 
 export const getAuthData = (token: string): ThunkType => {
     return async (dispatch) => {
-        dispatch(fetchInProgress(true))
+        dispatch(actions.fetchInProgress(true))
 
-        let authData = await authAPI.me(token)
+        let responseData = await authAPI.me(token)
 
-        if (authData.userId) {
-            dispatch(setAuthData(authData.userId, authData.name, authData.lastname, authData.nickname, authData.email))
+        if (responseData.statusCode === 0) {
+            dispatch(actions.setAuthData(responseData.authData))
         } else {
             localStorage.removeItem('userData')
         }
 
-        dispatch(fetchInProgress(false))
+        dispatch(actions.fetchInProgress(false))
     }
 }
 
-//formdata = {email: "someEmail", pass: "somePass"}
-export const login = (formData: any): ThunkType => {
+export type LoginFormDataType = {
+    email: string
+    pass: string
+}
+
+export const login = (formData: LoginFormDataType): ThunkType => {
     return async (dispatch) => {
-        let allAuthData = await authAPI.login(formData)
+        let responseData = await authAPI.login(formData)
 
-        if (allAuthData.token) {
-            localStorage.setItem('userData', JSON.stringify({token: allAuthData.token}));
 
-            dispatch(setAuthData(allAuthData.userId, allAuthData.name, allAuthData.lastname, allAuthData.nickname, allAuthData.email))
+        if (responseData.statusCode === 0) {
+            localStorage.setItem('userData', JSON.stringify({token: responseData.token}));
+
+            dispatch(actions.setAuthData(responseData.authData))
         } else {
-            if (window.M && allAuthData.message) {
-                window.M.toast({html: allAuthData.message}); //.toast это метод Материалайза, который выводит плашку с текстом на экран
+            if (window.M && responseData.message) {
+                window.M.toast({html: responseData.message}); //.toast это метод Материалайза, который выводит плашку с текстом на экран
             }
         }
     }
 }
-
-export type LogoutActionType = {type: typeof LOGOUT}
-export const logout = (): LogoutActionType => ({type: LOGOUT})
 
 export default authReduser;
