@@ -1,6 +1,7 @@
-import {authAPI} from "../api/api";
+import {authAPI, AuthDataType} from "../api/api";
 import {ThunkAction} from "redux-thunk";
 import {AppStateType, InferActionsTypes} from "./store";
+import {LoginFormDataType} from "../pages/login/AuthPage";
 
 let initialState = {
     userId: null as string | null,
@@ -45,23 +46,13 @@ export const authReduser = (state = initialState, action: ActionsTypes): Initial
 }
 
 type ActionsTypes = InferActionsTypes<typeof actions>
-
-type SetAuthLoginDataActionType = { //дубляж!!!!!!!!!!
-    userId: string,
-    email: string,
-    name: string,
-    lastname: string,
-    nickname: string
-} | null
+type ThunkType = ThunkAction<Promise<void>, AppStateType, unknown, ActionsTypes>
 
 export const actions = {
     fetchInProgress: (inProgress: boolean) => ({type: "FETCH_IN_PROGRESS", inProgress}) as const,
-    setAuthData: (authData: SetAuthLoginDataActionType) => ({type: "SET_AUTH_DATA", loginData: authData}) as const,
+    setAuthData: (authData: AuthDataType) => ({type: "SET_AUTH_DATA", loginData: authData}) as const,
     logout: () => ({type: "LOGOUT"}) as const
 }
-
-
-type ThunkType = ThunkAction<Promise<void>, AppStateType, unknown, ActionsTypes>
 
 export const getAuthData = (token: string): ThunkType => {
     return async (dispatch) => {
@@ -79,15 +70,9 @@ export const getAuthData = (token: string): ThunkType => {
     }
 }
 
-export type LoginFormDataType = {
-    email: string
-    pass: string
-}
-
 export const login = (formData: LoginFormDataType): ThunkType => {
     return async (dispatch) => {
         let responseData = await authAPI.login(formData)
-
 
         if (responseData.statusCode === 0) {
             localStorage.setItem('userData', JSON.stringify({token: responseData.token}));

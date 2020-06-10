@@ -1,8 +1,9 @@
 import React from 'react';
-import {Field, reduxForm} from "redux-form";
+import {Field, InjectedFormProps, reduxForm} from "redux-form";
 import {NavLink} from "react-router-dom";
+import {LoginFormDataType} from "./AuthPage";
 
-const LoginForms = (props) => {
+const LoginForms: React.FC<InjectedFormProps<LoginFormDataType>> = (props) => {
     return (
         <form onSubmit={props.handleSubmit}>
             <div className='row'>
@@ -37,7 +38,7 @@ const LoginForms = (props) => {
     );
 }
 
-const LoginFormsReduxForm = reduxForm({
+const LoginFormsReduxForm = reduxForm<LoginFormDataType>({
     form: 'login-form'
 })(LoginForms)
 

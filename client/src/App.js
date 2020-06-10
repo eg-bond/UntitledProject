@@ -2,7 +2,7 @@ import React, {useEffect} from 'react';
 import './App.css';
 import {Route, Switch} from "react-router-dom";
 import {connect} from "react-redux";
-import {getAuthData, logout} from "./redux/authReduser";
+import {getAuthData, actions} from "./redux/authReduser";
 import {Loader} from "./components/Loader";
 import 'materialize-css';
 import Navbar from "./components/Navbar";
@@ -37,6 +37,6 @@ const mapStateToProps = (state) => ({
     isFetching: state.auth.isFetching
 })
 
-export default connect(mapStateToProps, {logout, getAuthData})(App);
+export default connect(mapStateToProps, {logout: actions.logout, getAuthData})(App);
 
 
