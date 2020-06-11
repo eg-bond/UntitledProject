@@ -1,0 +1,28 @@
+.todoPage {
+    display: flex;
+    flex-direction: row;
+}
+.leftBar {
+    display: flex;
+    flex-direction: column;
+    flex: 1;
+    height: 200px;
+}
+.leftBar__btn {
+    align-self: flex-start;
+}
+
+
+.selectedTodo {
+    flex: 4
+}
+.selectedTodo__H {
+    margin: 0;
+}
+.selectedTodo__item:hover .selectedTodo__btn {
+    opacity: 1;
+}
+.selectedTodo__btn {
+    opacity: 0;
+    transition: ease 350ms;
+}

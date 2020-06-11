@@ -3,6 +3,9 @@ import IndexPage from "../pages/index/IndexPage";
 import RegisterPage from "../pages/register/RegisterPage";
 import AuthPage from "../pages/login/AuthPage";
 import {Redirect, Route, Switch} from "react-router-dom";
+import ToDoPage from "../pages/todo/ToDoPage";
+import DiaryPage from "../pages/diary/DiaryPage";
+
 
 
 export const Routes = ({isAuth}) => {
@@ -12,9 +15,11 @@ export const Routes = ({isAuth}) => {
         return (
             <Switch>
                 <Route path="/" exact><IndexPage/></Route>
+                <Route path="/todo"><ToDoPage/></Route>
+                <Route path="/diary"><DiaryPage/></Route>
                 <Redirect to="/" exact/>
             </Switch>
-        )
+        );
     }
 
     return (

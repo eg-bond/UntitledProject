@@ -2,10 +2,12 @@ import {combineReducers, compose, applyMiddleware, createStore} from "redux";
 import {reducer as formReducer} from 'redux-form';
 import thunkMiddleware from "redux-thunk";
 import authReduser from "./authReduser";
+import todoReduser from "./todoReduser";
 
 let rootReducer = combineReducers({
     form: formReducer,
-    auth: authReduser
+    auth: authReduser,
+    todo: todoReduser
 })
 
 type RootReducerType = typeof rootReducer  // (globalstate: AppStateType) => AppStateType

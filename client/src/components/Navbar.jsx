@@ -1,13 +1,27 @@
 import React from 'react';
-import {NavLink, Switch} from "react-router-dom";
+import {NavLink} from "react-router-dom";
 
-const Navbar = ({isAuth, logout}) => {
+const Navbar = ({isAuth, logout, name, lastname}) => {
 
     if (isAuth) {
         return (
             <div>
-                <button onClick={logout}>Logout</button>
+                <div className='navbar'>
+                    <div className='navbar__segment'>
+                        <NavLink className='navbar__item' to="/" exact>Index</NavLink>
+                        <NavLink className='navbar__item' to="todo" exact>Todo</NavLink>
+                        <NavLink className='navbar__item' to="diary" exact>Diary</NavLink>
+                    </div>
+                    <div className='navbar__segment'>
+                        Center
+                    </div>
+                    <div className='navbar__segment'>
+                        <span>{`${name} ${lastname}`}</span>
+                        <button onClick={logout}>Logout</button>
+                    </div>
+                </div>
             </div>
+
         );
     }
 
