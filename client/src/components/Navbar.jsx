@@ -9,8 +9,8 @@ const Navbar = ({isAuth, logout, name, lastname}) => {
                 <div className='navbar'>
                     <div className='navbar__segment'>
                         <NavLink className='navbar__item' to="/" exact>Index</NavLink>
-                        <NavLink className='navbar__item' to="todo" exact>Todo</NavLink>
-                        <NavLink className='navbar__item' to="diary" exact>Diary</NavLink>
+                        <NavLink className='navbar__item' to="/todo" exact>Todo</NavLink>
+                        <NavLink className='navbar__item' to="/diary" exact>Diary</NavLink>
                     </div>
                     <div className='navbar__segment'>
                         Center

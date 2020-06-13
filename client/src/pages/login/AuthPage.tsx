@@ -5,18 +5,6 @@ import {connect} from "react-redux";
 import {AppStateType} from "../../redux/store";
 
 
-export type LoginFormDataType = {
-    email: string
-    pass: string
-}
-type mapStateToPropsType = {
-    isAuth: boolean
-}
-type mapDispatchToPropsType = {
-    login: (formData: LoginFormDataType) => void
-}
-
-
 const AuthPage: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({login}) => {
 
     const onSubmit = (formData: LoginFormDataType) => {
@@ -31,8 +19,20 @@ const AuthPage: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({login
 }
 
 
+export type LoginFormDataType = {
+    email: string
+    pass: string
+}
+type mapStateToPropsType = {
+    isAuth: boolean
+}
+type mapDispatchToPropsType = {
+    login: (formData: LoginFormDataType) => void
+}
+
 const mapStateToProps = (state: AppStateType): mapStateToPropsType => ({ //Нужен ли isAuth?
     isAuth: state.auth.isAuth
 })
 
-export default connect(mapStateToProps, {login})(AuthPage);
+export default connect<mapStateToPropsType, mapDispatchToPropsType, null, AppStateType>(mapStateToProps, {login})(AuthPage);
+
