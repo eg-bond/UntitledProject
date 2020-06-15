@@ -1,7 +1,7 @@
-import React from 'react';
-import {connect} from "react-redux";
-import {getAuthData} from "../../redux/authReduser";
-import {AppStateType} from "../../redux/store";
+import React from 'react'
+import {connect} from "react-redux"
+import {getAuthData} from "../../redux/authReduser"
+import {AppStateType} from "../../redux/store"
 
 const IndexPage: React.FC<MapStateToPropsType & MapDispatchToPropsType> = ({name, lastname, getAuthData}) => {
 

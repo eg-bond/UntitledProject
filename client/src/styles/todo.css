@@ -26,3 +26,14 @@
     opacity: 0;
     transition: ease 350ms;
 }
+
+
+.redImp {
+    color: red;
+}
+.yellowImp {
+    color: #ffc818;
+}
+.greenImp {
+    color: #10c904;
+}

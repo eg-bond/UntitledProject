@@ -1,7 +1,7 @@
-import React from 'react';
-import {Field, InjectedFormProps, reduxForm} from "redux-form";
-import {NavLink} from "react-router-dom";
-import {LoginFormDataType} from "./AuthPage";
+import React from 'react'
+import {Field, InjectedFormProps, reduxForm} from "redux-form"
+import {NavLink} from "react-router-dom"
+import {LoginFormDataType} from "./AuthPage"
 
 const LoginForms: React.FC<InjectedFormProps<LoginFormDataType>> = (props) => {
     return (

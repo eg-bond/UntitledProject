@@ -11,12 +11,12 @@ let initialState = {
     ],
     todos: {
         todo1: [
-            {value: 'bye bread', importance: 'green', itemId: 0},
+            {value: 'bye bread', importance: 'red', itemId: 0},
             {value: 'bye milk', importance: 'yellow', itemId: 1},
-            {value: 'bye salt', importance: 'red', itemId: 2}
+            {value: 'bye salt', importance: 'noth', itemId: 2}
         ],
         todo2: [
-            {value: 'learn JS', importance: 'red', itemId: 0},
+            {value: 'learn JS', importance: 'green', itemId: 0},
             {value: 'do sports', importance: 'yellow', itemId: 1},
             {value: 'jerk off', importance: 'red', itemId: 2}
         ],
@@ -33,21 +33,21 @@ let initialState = {
 export type TodoInitialStateType = typeof initialState
 export type ContentItemType = {
     value: string,
-    importance: string,
+    importance: 'red' | 'yellow' | 'green' | 'noth',
     itemId: number
 }
 
-export const todoReduser = (state = initialState, action: ActionsTypes): TodoInitialStateType => {
+export const todoReduserNew = (state = initialState, action: ActionsTypes): TodoInitialStateType => {
 
     switch (action.type) {
-        case 'ADD_TODO':
+        case 'todo_new/ADD_TODO':
             state.idGen++;
             return {
                 ...state,
                 todoTitles: [...state.todoTitles, {todoTitle: "todo without name", id: `todo${state.idGen}`}],
                 todos: {...state.todos, [`todo${state.idGen}`]: []}
             }
-        case 'DELETE_TODO':
+        case 'todo_new/DELETE_TODO':
             let newTodoTitles = state.todoTitles.filter(item => item.id !== action.noteId)
 
             let newTodos = {...state.todos}
@@ -58,27 +58,27 @@ export const todoReduser = (state = initialState, action: ActionsTypes): TodoIni
                 todoTitles: [...newTodoTitles],
                 todos: {...newTodos}
             }
-        case 'ADD_TODO_ITEM':
-            let newContent = [...state.selectedTodo.content, {value: action.value, importance: action.importance, itemId: state.selectedTodo.content.length}]
-
-            return {
-                ...state,
-                todos: {...state.todos, [action.noteId]: newContent},
-                selectedTodo: {...state.selectedTodo, content: newContent}
-            }
-        case 'DELETE_TODO_ITEM':
-            let content = [...state.selectedTodo.content]
-            content.splice(action.itemId, 1)
-
-            for (let i = 0; i <= content.length-1; i++) { //упорядочиваем itemId
-                content[i].itemId = i
-            }
-            return {
-                ...state,
-                todos: {...state.todos, [action.noteId]: content},
-                selectedTodo: {...state.selectedTodo, content: content}
-            }
-        case 'SELECT_TODO':
+        // case 'todo_new/ADD_TODO_ITEM':
+        //     let newContent = [...state.selectedTodo.content, {value: action.value, importance: action.importance, itemId: state.selectedTodo.content.length}]
+        //
+        //     return {
+        //         ...state,
+        //         todos: {...state.todos, [action.noteId]: newContent},
+        //         selectedTodo: {...state.selectedTodo, content: newContent}
+        //     }
+        // case 'todo_new/DELETE_TODO_ITEM':
+        //     let content = [...state.selectedTodo.content]
+        //     content.splice(action.itemId, 1)
+        //
+        //     for (let i = 0; i <= content.length-1; i++) { //упорядочиваем itemId
+        //         content[i].itemId = i
+        //     }
+        //     return {
+        //         ...state,
+        //         todos: {...state.todos, [action.noteId]: content},
+        //         selectedTodo: {...state.selectedTodo, content: content}
+        //     }
+        case 'todo_new/SELECT_TODO':
             if (action.noteId) {
                 let titleObj = state.todoTitles.find(item => item.id === action.noteId)
                 // @ts-ignore
@@ -95,7 +95,7 @@ export const todoReduser = (state = initialState, action: ActionsTypes): TodoIni
                     selectedTodo: {title: '', content: []}
                 }
             }
-        case 'CHANGE_TODO_TITLE':
+        case 'todo_new/CHANGE_TODO_TITLE':
             let modifiedTodoTitles = state.todoTitles.map(item => {
                 if (item.id === action.noteId) {
                     return {...item, todoTitle: action.title}
@@ -105,22 +105,12 @@ export const todoReduser = (state = initialState, action: ActionsTypes): TodoIni
             })
             return {
                 ...state,
-                todoTitles: [...modifiedTodoTitles],
-                selectedTodo: {...state.selectedTodo, title: action.title}
+                todoTitles: [...modifiedTodoTitles]
             }
-        case 'CHANGE_TODO_ITEM_CONTENT':
-            //@ts-ignore
-            let modTodoItemContent = state.todos[action.noteId].map(item => {
-                if (item.itemId === action.itemId) {
-                    return {...item, value: action.value}
-                } else {
-                    return item
-                }
-            })
+        case 'todo_new/CHANGE_TODO_ITEM_CONTENT':
             return {
                 ...state,
-                todos: {...state.todos, [action.noteId]: [...modTodoItemContent]},
-                selectedTodo: {...state.selectedTodo, content: [...modTodoItemContent]}
+                todos: {...state.todos, [action.noteId]: [...action.content]}
             }
         default:
             return state;
@@ -131,13 +121,15 @@ type ActionsTypes = InferActionsTypes<typeof actions>
 // type ThunkType = ThunkAction<Promise<void>, AppStateType, unknown, ActionsTypes>
 
 export const actions = {
-    addTodo: () => ({type: 'ADD_TODO'}) as const,
-    deleteTodo: (noteId: string) => ({type: 'DELETE_TODO', noteId}) as const,
-    addTodoItem: (noteId: string, value: string, importance: string) => ({type: 'ADD_TODO_ITEM', noteId, value, importance}) as const,
-    deleteTodoItem: (noteId: string, itemId: number) => ({type: 'DELETE_TODO_ITEM', noteId, itemId}) as const,
-    selectTodo: (noteId: string) => ({type: 'SELECT_TODO', noteId}) as const,
-    changeTodoTitle: (noteId: string, title: string) => ({type: 'CHANGE_TODO_TITLE', noteId, title}) as const,
-    changeTodoItemContent: (noteId: string, value: string, itemId: number) => ({type: 'CHANGE_TODO_ITEM_CONTENT', noteId, value, itemId}) as const
+    addTodo: () => ({type: 'todo_new/ADD_TODO'}) as const,
+    deleteTodo: (noteId: string) => ({type: 'todo_new/DELETE_TODO', noteId}) as const,
+    addTodoItem: (noteId: string, value: string, importance: string) => ({type: 'todo_new/ADD_TODO_ITEM', noteId, value, importance}) as const,
+    deleteTodoItem: (noteId: string, itemId: number) => ({type: 'todo_new/DELETE_TODO_ITEM', noteId, itemId}) as const,
+    selectTodo: (noteId: string) => ({type: 'todo_new/SELECT_TODO', noteId}) as const,
+    changeTodoTitle: (noteId: string, title: string) => ({type: 'todo_new/CHANGE_TODO_TITLE', noteId, title}) as const,
+    // changeTodoItemContent: (noteId: string, value: string, itemId: number) => ({type: 'CHANGE_TODO_ITEM_CONTENT', noteId, value, itemId}) as const
+    changeTodoItemContent: (noteId: string, content: Array<ContentItemType>) => ({type: 'todo_new/CHANGE_TODO_ITEM_CONTENT', noteId, content}) as const
+
 }
 
 
@@ -145,4 +137,4 @@ export const actions = {
 
 
 
-export default todoReduser;
+export default todoReduserNew;

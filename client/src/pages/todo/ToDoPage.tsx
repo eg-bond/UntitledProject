@@ -1,4 +1,4 @@
-import React, {EffectCallback, useEffect} from 'react'
+import React, {EffectCallback, useEffect, useState} from 'react'
 import {connect} from "react-redux";
 import {compose} from "redux";
 import {AppStateType} from "../../redux/store";
@@ -10,11 +10,19 @@ import {NavLink, useParams, withRouter} from "react-router-dom";
 const ToDoPage: React.FC<MapStateToPropsType & MapDispatchToPropsType & WithRouterPropsType> =
     ({todoTitles, selectedTodo, addTodo, deleteTodo, addTodoItem, deleteTodoItem, selectTodo, ...props}) => {
 
+    const [todoTitle, setTodoTitle] = useState('');
+    const [todoValue, setTodoValue] = useState('');
+    const [editMode, activateEditMode] = useState(false)    ;
+
+
     let { todoId } = useParams();
+    //@ts-ignore
+    const [localTodoContent, setTodoContent] = useState(props.todos[todoId])
 
     useEffect(() => {
         selectTodo(todoId)
-    }, [todoId])
+        setTodoTitle(selectedTodo.title)
+    }, [todoId, selectedTodo.title])
 
     return (
         <div>
@@ -31,10 +39,23 @@ const ToDoPage: React.FC<MapStateToPropsType & MapDispatchToPropsType & WithRout
 
 
                 <div className="selectedTodo">
-                    <h2 className='selectedTodo__H'>{selectedTodo.title}</h2>
+                    <input onBlur={() => props.changeTodoTitle(todoId, todoTitle)} onChange={(e) => setTodoTitle(e.target.value)} value={todoTitle} className='selectedTodo__H'/>
+                    {/*<TodoTitleForm title={selectedTodo.title} />*/}
                     <div className="selectedTodo__items">
                         {selectedTodo.content.map(todo =><div key={`${todoId}_${todo.itemId}`} className="selectedTodo__item">
-                            {todo.value}
+                            {/*<div>*/}
+                                {/*{ !editMode &&*/}
+                                {/*<div>*/}
+                                    {/*<span onDoubleClick={() => activateEditMode(true)}>{todo.value}</span>*/}
+                                {/*</div>*/}
+                                {/*}*/}
+                                {/*{ editMode &&*/}
+                                {/*<div>*/}
+                                    {/*<input onChange={() => {}} onBlur={() => activateEditMode(false)} value={todo.value}/>*/}
+                                {/*</div>*/}
+                                {/*}*/}
+                            {/*</div>*/}
+                            <input onChange={(e) => setTodoValue(e.target.value)} value={todo.value}/>
                             <button onClick={() => deleteTodoItem(todoId, todo.itemId)} className='selectedTodo__btn'>del</button>
                         </div>)}
                         <button onClick={() => addTodoItem(todoId, 'newTodoItem', 'noth')}>Add todo item</button>
@@ -52,7 +73,8 @@ type WithRouterPropsType = {
 }
 type MapStateToPropsType = {
     todoTitles: TodoInitialStateType['todoTitles'],
-    selectedTodo: TodoInitialStateType['selectedTodo']
+    todos: TodoInitialStateType['todos']
+    selectedTodo: TodoInitialStateType['selectedTodo'],
 }
 type MapDispatchToPropsType = {
     addTodo: () => void
@@ -60,10 +82,13 @@ type MapDispatchToPropsType = {
     addTodoItem: (noteId: string, value: string, importance: string) => void
     deleteTodoItem: (noteId: string, itemId: number) => void
     selectTodo: (todoId: string) => void
+    changeTodoTitle: (noteId: string, title: string) => void
+    changeTodoItemContent: (noteId: string, value: string,  itemId: number) => void
 }
 
 const mapStateToProps = (state: AppStateType): MapStateToPropsType => ({
     todoTitles: state.todo.todoTitles,
+    todos: state.todo.todos,
     selectedTodo: state.todo.selectedTodo
 })
 
@@ -71,6 +96,7 @@ const mapStateToProps = (state: AppStateType): MapStateToPropsType => ({
 export default compose(
     connect<MapStateToPropsType, MapDispatchToPropsType, WithRouterPropsType, AppStateType>(
     mapStateToProps, {addTodo: actions.addTodo, deleteTodo: actions.deleteTodo,
-        addTodoItem: actions.addTodoItem, deleteTodoItem: actions.deleteTodoItem, selectTodo: actions.selectTodo}),
+        addTodoItem: actions.addTodoItem, deleteTodoItem: actions.deleteTodoItem, selectTodo: actions.selectTodo,
+            changeTodoTitle: actions.changeTodoTitle, changeTodoItemContent: actions.changeTodoItemContent}),
     withRouter,
 )(ToDoPage)

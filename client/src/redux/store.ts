@@ -3,11 +3,13 @@ import {reducer as formReducer} from 'redux-form';
 import thunkMiddleware from "redux-thunk";
 import authReduser from "./authReduser";
 import todoReduser from "./todoReduser";
+import {todoReduserNew} from "./todoReduserNew";
 
 let rootReducer = combineReducers({
     form: formReducer,
     auth: authReduser,
-    todo: todoReduser
+    todo: todoReduser,
+    todo_new: todoReduserNew
 })
 
 type RootReducerType = typeof rootReducer  // (globalstate: AppStateType) => AppStateType
