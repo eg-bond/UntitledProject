@@ -17,7 +17,7 @@ export const Routes = ({isAuth}) => {
             <Switch>
                 <Route path="/" exact><IndexPage/></Route>
                 <Route path="/todo/:todoId?"><ToDoPage/></Route>
-                <Route path="/todolocal/:todoId?"><ToDoPageWithLocalContent/></Route>
+                {/*<Route path="/todolocal/:todoId?"><ToDoPageWithLocalContent/></Route>*/}
                 <Route path="/diary"><DiaryPage/></Route>
                 <Redirect to="/" exact/>
             </Switch>

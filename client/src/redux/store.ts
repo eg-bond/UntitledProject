@@ -1,8 +1,8 @@
 import {combineReducers, compose, applyMiddleware, createStore} from "redux";
 import {reducer as formReducer} from 'redux-form';
 import thunkMiddleware from "redux-thunk";
-import authReduser from "./authReduser";
-import todoReduser from "./todoReduser";
+import authReduser, {AuthInitialStateType} from "./authReduser";
+import todoReduser, {TodoInitialStateType} from "./todoReduser";
 import {todoReduserNew} from "./todoReduserNew";
 
 let rootReducer = combineReducers({
@@ -14,6 +14,11 @@ let rootReducer = combineReducers({
 
 type RootReducerType = typeof rootReducer  // (globalstate: AppStateType) => AppStateType
 export type AppStateType = ReturnType<RootReducerType>  // ReturnType вытаскивает возвращаемое из функции значение
+// export type AppStateType = {
+//     auth: AuthInitialStateType
+//     todo: TodoInitialStateType
+// }
+
 
 // typization for actions
 type PropertiesTypes<T> = T extends {[key: string]: infer U} ? U : never

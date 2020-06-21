@@ -1,50 +1,30 @@
-let initialState: TodoInitialStateType = {
-    idGen: 3,
-    todoTitles: [
-        {todoTitle: 'someName1', id: 'todo1'},
-        {todoTitle: 'someName2', id: 'todo2'}
+import {TodoInitialStateType} from "./todoReduser";
+
+
+let someState = {
+    idGenerator: 2,
+    todoListObj: [
+        {title: 'someName1', id: 'eg_bond_todo1'},
+        {title: 'someName2', id: 'eg_bond_todo2'}
     ],
-    todos: {
-        todo1: [
-            {value: 'bye bread', importance: 'green', itemId: 0},
-            {value: 'bye milk', importance: 'yellow', itemId: 1},
-            {value: 'bye salt', importance: 'red', itemId: 2}
+    todoContentObj: {
+        eg_bond_todo1: [
+            {value: 'bye bread', importance: 'green', orderNum: 0},
+            {value: 'bye milk', importance: 'yellow', orderNum: 1},
+            {value: 'bye salt', importance: 'red', orderNum: 2}
         ],
-        todo2: [
-            {value: 'learn JS', importance: 'red', itemId: 0},
-            {value: 'do sports', importance: 'yellow', itemId: 1},
-            {value: 'jerk off', importance: 'red', itemId: 2}
+        eg_bond_todo2: [
+            {value: 'learn JS', importance: 'red', orderNum: 0},
+            {value: 'do sports', importance: 'yellow', orderNum: 1},
+            {value: 'jerk off', importance: 'red', orderNum: 2}
         ],
     },
     selectedTodo: {
         title: 'someName1',
         content: [
-            {value: 'bye bread', importance: 'green', itemId: 0},
-            {value: 'bye milk', importance: 'yellow', itemId: 1},
-            {value: 'bye salt', importance: 'red', itemId: 2}]
-    }
-}
-type TodoItemType = {
-    value: string,
-    importance: string,
-    itemId: number
-}
-type TodoTitlesItemType = {
-    todoTitle: string,
-    id: string
-}
-
-type FullStateType = {
-    idGen: number,
-    todoTitles: Array<TodoTitlesItemType>,
-    todos: {
-        [key: string]: Array<TodoItemType>
-    },
-    selectedTodo: {
-        title: string,
-        content: Array<TodoItemType>
+            {value: 'bye bread', importance: 'green', orderNum: 0},
+            {value: 'bye milk', importance: 'yellow', orderNum: 1},
+            {value: 'bye salt', importance: 'red', orderNum: 2}]
     }
 }
 
-
-export type TodoInitialStateType = FullStateType
