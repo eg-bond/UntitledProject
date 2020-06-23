@@ -7,15 +7,20 @@ type InputType = {
     orderNum: number
 }
 
-export const TodoInput: React.FC<InputType> = ({value, modifyTodoContent, todoId, orderNum}) => {
+export const TodoInput: React.FC<{value: string, importance: string, orderNum: number, modifyTodoContent: any, todoId: string}> = (props) => {
 
-    const [insideValue, changeInsideValue] = useState(value)
+    const importanceClass = (imp: string): string => {
+        return imp === "red"
+            ? "redImp"
+            : imp === "yellow"
+                ? "yellowImp"
+                : imp === "green"
+                    ? "greenImp"
+                    : "";
+    };
 
-    return <input type="text"
-                   onChange={(e) => changeInsideValue(e.target.value)}
-                   value={insideValue}
-                   onBlur={() => modifyTodoContent(todoId, insideValue, orderNum)}/>
+    const [insideValue, changeInsideValue] = useState(props.value)
 
-
-
+    return <input className={importanceClass(props.importance)} onChange={(e) => changeInsideValue(e.target.value)} value={insideValue}
+                  onKeyDown={(e: any) => e.key === "Enter" && e.target.blur()} onBlur={() => props.modifyTodoContent(props.todoId, insideValue, props.importance, props.orderNum)}/>
 }

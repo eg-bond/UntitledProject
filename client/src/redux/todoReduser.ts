@@ -1,13 +1,14 @@
-import {authAPI, AuthDataType} from "../api/api";
+import {authAPI, AuthDataType, todoAPI, TodoAPIInitialStateType} from "../api/api";
 import {ThunkAction} from "redux-thunk";
 import {AppStateType, InferActionsTypes} from "./store";
 import {LoginFormDataType} from "../pages/login/AuthPage";
+import {authActions} from "./authReduser";
 
 let initialState = {
-    idGenerator: 2,
-    todoListObj: [
-        {title: 'someName1', id: 'eg_bond_todo1'},
-        {title: 'someName2', id: 'eg_bond_todo2'}
+    idGenerator: 4,
+    todoListArr: [
+        {title: 'lol', id: 'eg_asddo1'},
+        {title: 'lol2', id: 'eg_basdo2'}
     ],
     todoContentObj: {
         eg_bond_todo1: [
@@ -31,14 +32,15 @@ let initialState = {
 }
 
 
+
 // export type TodoContentObjType = TodoInitialStateGeneralType["todoContentObj"];
 // export type SelectedTodoType = TodoInitialStateGeneralType["selectedTodo"];
 // //
-// // export type TodoInitialStateType = TodoListObjType & TodoContentObjType & SelectedTodoType;
+// // export type TodoInitialStateType = todoListArrType & TodoContentObjType & SelectedTodoType;
 //
 // export type TodoInitialStateType = {
 //     idGenerator: number,
-//     todoListObj: TodoListObjType,
+//     todoListArr: todoListArrType,
 //     todoContentObj: TodoContentObjType,
 //     selectedTodo: SelectedTodoType
 // }
@@ -50,14 +52,14 @@ let initialState = {
 // export type TodoInitialStateGeneralType = typeof initialState;
 // export type TodoIdType = keyof TodoInitialStateGeneralType["todoContentObj"];
 
-// export type TodoListObjType = Array<{
+// export type todoListArrType = Array<{
 //     title: string
 //     id: TodoIdType
 // }>;
 
 // export type TodoInitialStateType = {
 //     idGenerator: number,
-//     todoListObj: TodoListObjType,
+//     todoListArr: todoListArrType,
 //     todoContentObj: {
 //         [key: string]: Array<ContentItemType>
 //     },
@@ -79,22 +81,30 @@ export type TodoInitialStateType = typeof initialState
 export const todoReduser = (state = initialState, action: ActionsTypes): TodoInitialStateType => {
 
     switch (action.type) {
+        case "todo/SET_INITIAL_TODO_DATA":
+            return {
+                ...state,
+                idGenerator: action.todoData.idGenerator,
+                todoListArr: [...action.todoData.todoListArr],
+                //@ts-ignore
+                todoContentObj: {...action.todoData.todoContentObj},
+            }
         case 'todo/ADD_TODO':
             state.idGenerator++;
             return {
                 ...state,
-                todoListObj: [...state.todoListObj, {title: "todo without name", id: `eg_bond_todo${state.idGenerator}`}],
+                todoListArr: [...state.todoListArr, {title: "todo without name", id: `eg_bond_todo${state.idGenerator}`}],
                 todoContentObj: {...state.todoContentObj, [`eg_bond_todo${state.idGenerator}`]: []}
             }
         case 'todo/DELETE_TODO':
-            let redusedTodoListObj = state.todoListObj.filter(item => item.id !== action.todoId)
+            let redusedtodoListArr = state.todoListArr.filter(item => item.id !== action.todoId)
 
             let redusedTodoContentObj = {...state.todoContentObj}
             //@ts-ignore
             for (let key in redusedTodoContentObj) {key === action.todoId && delete redusedTodoContentObj[key]}
             return {
                 ...state,
-                todoListObj: [...redusedTodoListObj],
+                todoListArr: [...redusedtodoListArr],
                 todoContentObj: {...redusedTodoContentObj}
             }
         case 'todo/ADD_TODO_CONTENT_ITEM':
@@ -119,7 +129,7 @@ export const todoReduser = (state = initialState, action: ActionsTypes): TodoIni
             }
         case 'todo/SELECT_TODO':
             if (action.todoId) {
-                let titleObj = state.todoListObj.find(item => item.id === action.todoId)
+                let titleObj = state.todoListArr.find(item => item.id === action.todoId)
                 //@ts-ignore
                 let content = state.todoContentObj[action.todoId]
                 if (titleObj) {
@@ -135,7 +145,7 @@ export const todoReduser = (state = initialState, action: ActionsTypes): TodoIni
                 }
             }
         case 'todo/CHANGE_TODO_TITLE':
-            let modifiedTodoTitles = state.todoListObj.map(item => {
+            let modifiedTodoTitles = state.todoListArr.map(item => {
                 if (item.id === action.todoId) {
                     return {...item, title: action.title}
                 } else {
@@ -144,7 +154,7 @@ export const todoReduser = (state = initialState, action: ActionsTypes): TodoIni
             })
             return {
                 ...state,
-                todoListObj: [...modifiedTodoTitles],
+                todoListArr: [...modifiedTodoTitles],
                 selectedTodo: {...state.selectedTodo, title: action.title}
             }
         case 'todo/MODIFY_TODO_CONTENT':
@@ -171,7 +181,7 @@ export const todoReduser = (state = initialState, action: ActionsTypes): TodoIni
 }
 
 type ActionsTypes = InferActionsTypes<typeof actions>
-// type ThunkType = ThunkAction<void, AppStateType, unknown, ActionsTypes>
+type ThunkType = ThunkAction<void, AppStateType, unknown, ActionsTypes>
 
 export const actions = {
     addTodo: () => ({type: 'todo/ADD_TODO'}) as const,
@@ -180,7 +190,24 @@ export const actions = {
     deleteTodoContentItem: (todoId: string, orderNum: number) => ({type: 'todo/DELETE_TODO_CONTENT_ITEM', todoId, orderNum }) as const,
     selectTodo: (todoId: string) => ({type: 'todo/SELECT_TODO', todoId}) as const,
     changeTodoTitle: (todoId: string, title: string) => ({type: 'todo/CHANGE_TODO_TITLE', todoId, title}) as const,
-    modifyTodoContent: (todoId: string, value: string, importance: string, orderNum: number) => ({type: 'todo/MODIFY_TODO_CONTENT', todoId, value, importance, orderNum }) as const
+    modifyTodoContent: (todoId: string, value: string, importance: string, orderNum: number) => ({type: 'todo/MODIFY_TODO_CONTENT', todoId, value, importance, orderNum }) as const,
+    setInitialTodoData: (todoData: TodoAPIInitialStateType) => ({type: 'todo/SET_INITIAL_TODO_DATA', todoData}) as const
+}
+
+export const getTodo = (): ThunkType => {
+    return async (dispatch) => {
+        debugger
+        //@ts-ignore
+        dispatch(authActions.fetchInProgress(true)) // из authReduser
+
+        let responseData = await todoAPI.getTodo()
+
+        if (responseData.statusCode === 0) {
+            dispatch(actions.setInitialTodoData(responseData.todoData))
+        }
+        //@ts-ignore
+        dispatch(authActions.fetchInProgress(false))
+    }
 }
 
 

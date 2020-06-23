@@ -1,14 +1,15 @@
 import React, {useEffect} from 'react';
 import './App.css';
 import {connect} from "react-redux";
-import {getAuthData, actions} from "./redux/authReduser";
+import {getAuthData, authActions} from "./redux/authReduser";
 import {Loader} from "./components/Loader";
 import 'materialize-css';
 import Navbar from "./components/Navbar";
 import {Routes} from "./components/Routes";
 import {AppStateType} from "./redux/store";
+import {getTodo} from "./redux/todoReduser";
 
-const App: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({isAuth, logout, name, lastname, getAuthData, isFetching}) => {
+const App: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({isAuth, logout, name, lastname, getAuthData, isFetching, getTodo}) => {
 
     //if token in LS exists - get userData from server
     useEffect(() => {
@@ -16,7 +17,9 @@ const App: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({isAuth, lo
         const token = JSON.parse(localStorage.getItem('userData'))
         if (!!token) {
             getAuthData(token)
+            getTodo()
         }
+
     }, [])
 
 
@@ -44,6 +47,7 @@ type mapStateToPropsType = {
 type mapDispatchToPropsType = {
     logout: () => void,
     getAuthData: (token: string) => void
+    getTodo: () => void
 }
 
 const mapStateToProps = (state: AppStateType): mapStateToPropsType => ({
@@ -53,6 +57,6 @@ const mapStateToProps = (state: AppStateType): mapStateToPropsType => ({
     isFetching: state.auth.isFetching
 })
 
-export default connect(mapStateToProps, {logout: actions.logout, getAuthData})(App);
+export default connect(mapStateToProps, {logout: authActions.logout, getTodo, getAuthData})(App);
 
 

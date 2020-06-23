@@ -7,10 +7,12 @@ import {
     TodoInitialStateType
 } from "../../redux/todoReduser";
 import {NavLink, useParams, useHistory, withRouter} from "react-router-dom";
+import {TodoInput} from "./TodoInput";
+import {todoAPI} from "../../api/api";
 
 
 const ToDoPage: React.FC<MapStateToPropsType & MapDispatchToPropsType & WithRouterPropsType> =
-    ({todoListObj, selectedTodo, addTodo, deleteTodo, addTodoContentItem, deleteTodoContentItem, selectTodo, modifyTodoContent, ...props}) => {
+    ({todoListArr, selectedTodo, addTodo, deleteTodo, addTodoContentItem, deleteTodoContentItem, selectTodo, modifyTodoContent, ...props}) => {
 
         let history = useHistory()
         let {todoId} = useParams()
@@ -22,15 +24,15 @@ const ToDoPage: React.FC<MapStateToPropsType & MapDispatchToPropsType & WithRout
             deleteTodo(thisTodoId)
 
             if (todoId === thisTodoId) {
-                let index = todoListObj.findIndex(item => item.id === thisTodoId)
+                let index = todoListArr.findIndex(item => item.id === thisTodoId)
 
                 let nextTodoUrl = () => index === 0
-                    ? history.push(`/todo/${todoListObj[index + 1].id}`)
-                    : history.push(`/todo/${todoListObj[index - 1].id}`)
+                    ? history.push(`/todo/${todoListArr[index + 1].id}`)
+                    : history.push(`/todo/${todoListArr[index - 1].id}`)
 
                 let emptyTodoUrl = () => history.push(`/todo`)
 
-                todoListObj.length > 1 ? nextTodoUrl() : emptyTodoUrl()
+                todoListArr.length > 1 ? nextTodoUrl() : emptyTodoUrl()
             }
         }
 
@@ -58,7 +60,33 @@ const ToDoPage: React.FC<MapStateToPropsType & MapDispatchToPropsType & WithRout
             // debugger;
             selectTodo(todoId)
             setLocalTodoTitle(selectedTodo.title)
+
         }, [todoId, selectedTodo.title])
+
+        type ContentItemType = {
+            value: string,
+            importance: string,
+            orderNum: number
+        }
+        type BodyType = {
+            idGenerator: number,
+            todoListArr: Array<{title: string, id: string}>,
+            todoContentObj: {
+                [key: string]: Array<ContentItemType>
+            }
+        }
+
+        useEffect(() => {
+            console.log('mount')
+            return () => {
+                let body = {
+                    idGenerator: props.idGenerator,
+                    todoListArr,
+                    todoContentObj: props.todoContentObj
+                }
+                // todoAPI.syncTodo(body)
+            }
+        }, [])
 
 
         return (
@@ -66,7 +94,7 @@ const ToDoPage: React.FC<MapStateToPropsType & MapDispatchToPropsType & WithRout
                 <div className="todoPage">
 
                     <div className="leftBar">
-                        {todoListObj.map(todo => <div key={todo.id}>
+                        {todoListArr.map(todo => <div key={todo.id}>
                             <NavLink to={`/todo/${todo.id}`} className="leftBar__item">{todo.title}</NavLink>
                             <button onClick={() => deleteTodoHandler(todo.id)}>del</button>
                         </div>)}
@@ -80,6 +108,7 @@ const ToDoPage: React.FC<MapStateToPropsType & MapDispatchToPropsType & WithRout
                         <div className="selectedTodo__items">
                             {selectedTodo.content.map(contentItem=><div key={`${todoId}_${ contentItem.orderNum}`} className="selectedTodo__item">
                                 <CustomInput value={contentItem.value} importance={contentItem.importance} orderNum={contentItem.orderNum}/>
+                                {/*<TodoInput todoId={todoId} modifyTodoContent={modifyTodoContent} value={contentItem.value} importance={contentItem.importance} orderNum={contentItem.orderNum}/>*/}
                                 <button onClick={() => modifyTodoContent(todoId, contentItem.value, "red", contentItem.orderNum)} className='selectedTodo__btn'>red</button>
                                 <button onClick={() => modifyTodoContent(todoId, contentItem.value, "yellow", contentItem.orderNum)} className='selectedTodo__btn'>yel</button>
                                 <button onClick={() => modifyTodoContent(todoId, contentItem.value, "green", contentItem.orderNum)} className='selectedTodo__btn'>grn</button>
@@ -100,12 +129,13 @@ type WithRouterPropsType = {
     history: Array<string>
 }
 // type MapStateToPropsType = {
-//     todoListObj: TodoListObjType;
+//     todoListArr: todoListArrType;
 //     todoContentObj: TodoContentObjType;
 //     selectedTodo: SelectedTodoType;
 // }
 type MapStateToPropsType = {
-    todoListObj: TodoInitialStateType['todoListObj'],
+    idGenerator: number,
+    todoListArr: TodoInitialStateType['todoListArr'],
     todoContentObj: TodoInitialStateType['todoContentObj']
     selectedTodo: TodoInitialStateType['selectedTodo'],
 }
@@ -120,7 +150,8 @@ type MapDispatchToPropsType = {
 }
 
 const mapStateToProps = (state: AppStateType): MapStateToPropsType => ({
-    todoListObj: state.todo.todoListObj,
+    idGenerator: state.todo.idGenerator,
+    todoListArr: state.todo.todoListArr,
     todoContentObj: state.todo.todoContentObj,
     selectedTodo: state.todo.selectedTodo
 })
