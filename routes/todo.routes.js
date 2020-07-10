@@ -1,7 +1,5 @@
 const {Router} = require('express');
-const bcrypt = require('bcryptjs');
 const config = require('config');
-const {check, validationResult} = require('express-validator');
 const User = require('../models/User');
 const Todo = require('../models/Todo');
 const jwt = require('jsonwebtoken');
@@ -12,14 +10,20 @@ router.post(
 
     async (req, res) => {
         try {
+            const {idGenerator, todoListArr, todoContentObj, token} = req.body
 
-            const {idGenerator, todoListArr, todoContentObj} = req.body
-            console.log(idGenerator)
-            console.log(todoListArr)
-            console.log(todoContentObj)
-            const todo = new Todo({idGenerator, todoListArr, todoContentObj});
-            console.log(todo)
-            await todo.save()
+            const decoded = jwt.verify(token, config.get('jwtSecret'))
+            const {userId} = decoded
+
+            const user = await User.findOne({_id: userId})
+            const todo = await Todo.findOne({owner: userId})
+
+            if (todo) {
+                await todo.updateOne({idGenerator, todoListArr, todoContentObj})
+            } else {
+                const todo = new Todo({idGenerator, todoListArr, todoContentObj, owner: user.id});
+                await todo.save()
+            }
 
             res.status(201).json({message: 'Синхронизация todo прошла успешно'})
 
@@ -28,21 +32,23 @@ router.post(
         }
     });
 
-router.get(
+router.post(
     '/get_todo', //эндпоинт
 
     async (req, res) => {
         try {
+            const {token} = req.body
 
-            const idGenerator = 2
+            const decoded = jwt.verify(token, config.get('jwtSecret'))
+            const {userId} = decoded
 
-            const todo = await Todo.findOne({idGenerator })
+            const todo = await Todo.findOne({owner: userId})
 
             if (!todo) {
                 return res.status(400).json({message: 'Инфа не найдена'})
             }
 
-            const {todoListArr, todoContentObj} = todo
+            const {idGenerator,todoListArr, todoContentObj} = todo
 
             res.json({
                 statusCode: 0,

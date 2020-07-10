@@ -1,5 +1,5 @@
 import React, {useEffect, useState} from 'react'
-import {connect} from "react-redux";
+import {connect, useStore} from "react-redux";
 import {compose} from "redux";
 import {AppStateType} from "../../redux/store";
 import {
@@ -16,6 +16,8 @@ const ToDoPage: React.FC<MapStateToPropsType & MapDispatchToPropsType & WithRout
 
         let history = useHistory()
         let {todoId} = useParams()
+        let currentStore = useStore()
+
         const [localTodoTitle, setLocalTodoTitle] = useState('');
 
 
@@ -77,14 +79,19 @@ const ToDoPage: React.FC<MapStateToPropsType & MapDispatchToPropsType & WithRout
         }
 
         useEffect(() => {
-            console.log('mount')
+            console.log(props.match.url)
+
             return () => {
+                // console.log(props.match.url)
+                let currentTodoState = currentStore.getState().todo
+
                 let body = {
-                    idGenerator: props.idGenerator,
-                    todoListArr,
-                    todoContentObj: props.todoContentObj
+                    idGenerator: currentTodoState.idGenerator,
+                    todoListArr: currentTodoState.todoListArr,
+                    todoContentObj: currentTodoState.todoContentObj
                 }
-                // todoAPI.syncTodo(body)
+                console.log(body)
+                todoAPI.syncTodo(body)
             }
         }, [])
 
@@ -128,11 +135,6 @@ type WithRouterPropsType = {
     match: any,
     history: Array<string>
 }
-// type MapStateToPropsType = {
-//     todoListArr: todoListArrType;
-//     todoContentObj: TodoContentObjType;
-//     selectedTodo: SelectedTodoType;
-// }
 type MapStateToPropsType = {
     idGenerator: number,
     todoListArr: TodoInitialStateType['todoListArr'],

@@ -14,7 +14,7 @@ const App: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({isAuth, lo
     //if token in LS exists - get userData from server
     useEffect(() => {
         // @ts-ignore
-        const token = JSON.parse(localStorage.getItem('userData'))
+        const token = JSON.parse(localStorage.userData)
         if (!!token) {
             getAuthData(token)
             getTodo()

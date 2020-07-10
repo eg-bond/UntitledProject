@@ -4,79 +4,61 @@ import {AppStateType, InferActionsTypes} from "./store";
 import {LoginFormDataType} from "../pages/login/AuthPage";
 import {authActions} from "./authReduser";
 
-let initialState = {
-    idGenerator: 4,
-    todoListArr: [
-        {title: 'lol', id: 'eg_asddo1'},
-        {title: 'lol2', id: 'eg_basdo2'}
-    ],
-    todoContentObj: {
-        eg_bond_todo1: [
-            {value: 'bye bread', importance: 'green', orderNum: 0},
-            {value: 'bye milk', importance: 'yellow', orderNum: 1},
-            {value: 'bye salt', importance: 'red', orderNum: 2}
-        ],
-        eg_bond_todo2: [
-            {value: 'learn JS', importance: 'red', orderNum: 0},
-            {value: 'do sports', importance: 'yellow', orderNum: 1},
-            {value: 'jerk off', importance: 'red', orderNum: 2}
-        ],
-    },
-    selectedTodo: {
-        title: 'someName1',
-        content: [
-            {value: 'bye bread', importance: 'green', orderNum: 0},
-            {value: 'bye milk', importance: 'yellow', orderNum: 1},
-            {value: 'bye salt', importance: 'red', orderNum: 2}]
-    }
-}
-
-
-
-// export type TodoContentObjType = TodoInitialStateGeneralType["todoContentObj"];
-// export type SelectedTodoType = TodoInitialStateGeneralType["selectedTodo"];
-// //
-// // export type TodoInitialStateType = todoListArrType & TodoContentObjType & SelectedTodoType;
-//
-// export type TodoInitialStateType = {
-//     idGenerator: number,
-//     todoListArr: todoListArrType,
-//     todoContentObj: TodoContentObjType,
-//     selectedTodo: SelectedTodoType
-// }
-// let someNewState: TodoInitialStateType = initialState
-//
-//
-
-
-// export type TodoInitialStateGeneralType = typeof initialState;
-// export type TodoIdType = keyof TodoInitialStateGeneralType["todoContentObj"];
-
-// export type todoListArrType = Array<{
-//     title: string
-//     id: TodoIdType
-// }>;
-
-// export type TodoInitialStateType = {
-//     idGenerator: number,
-//     todoListArr: todoListArrType,
+// let initialState = {
+//     idGenerator: 4,
+//     todoListArr: [
+//         {title: 'lol', id: 'eg_asddo1'},
+//         {title: 'lol2', id: 'eg_basdo2'}
+//     ],
 //     todoContentObj: {
-//         [key: string]: Array<ContentItemType>
+//         eg_bond_todo1: [
+//             {value: 'bye bread', importance: 'green', orderNum: 0},
+//             {value: 'bye milk', importance: 'yellow', orderNum: 1},
+//             {value: 'bye salt', importance: 'red', orderNum: 2}
+//         ],
+//         eg_bond_todo2: [
+//             {value: 'learn JS', importance: 'red', orderNum: 0},
+//             {value: 'do sports', importance: 'yellow', orderNum: 1},
+//             {value: 'jerk off', importance: 'red', orderNum: 2}
+//         ],
 //     },
 //     selectedTodo: {
-//         title: string,
-//         content: Array<ContentItemType>
+//         title: 'someName1',
+//         content: [
+//             {value: 'bye bread', importance: 'green', orderNum: 0},
+//             {value: 'bye milk', importance: 'yellow', orderNum: 1},
+//             {value: 'bye salt', importance: 'red', orderNum: 2}]
 //     }
 // }
 
-export type TodoInitialStateType = typeof initialState
 
-// export type ContentItemType = {
-//     value: string,
-//     importance: string,
-//     orderNum: number
-// }
 
+type TodoContentObjType = {
+  [key: string]: Array<{
+    value: string;
+    importance: string;
+    orderNum: number;
+  }>;
+};
+export type TodoInitialStateType = {
+    idGenerator: number
+    todoListArr: Array<{ title: string; id: string }>
+    todoContentObj: TodoContentObjType
+    selectedTodo: {
+        title: string
+        content: Array<{ value: string; importance: string; orderNum: number }>
+    };
+};
+let initialState: TodoInitialStateType = {
+    idGenerator: 0,
+    todoListArr: [],
+    todoContentObj: {},
+    selectedTodo: {
+        title: "",
+        content: []
+    }
+};
+// export type TodoInitialStateType = typeof initialState
 
 export const todoReduser = (state = initialState, action: ActionsTypes): TodoInitialStateType => {
 

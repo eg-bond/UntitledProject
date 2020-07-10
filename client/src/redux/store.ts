@@ -8,16 +8,15 @@ import {todoReduserNew} from "./todoReduserNew";
 let rootReducer = combineReducers({
     form: formReducer,
     auth: authReduser,
-    todo: todoReduser,
-    todo_new: todoReduserNew
+    todo: todoReduser
 })
 
-type RootReducerType = typeof rootReducer  // (globalstate: AppStateType) => AppStateType
-export type AppStateType = ReturnType<RootReducerType>  // ReturnType вытаскивает возвращаемое из функции значение
-// export type AppStateType = {
-//     auth: AuthInitialStateType
-//     todo: TodoInitialStateType
-// }
+// type RootReducerType = typeof rootReducer  // (globalstate: AppStateType) => AppStateType
+// export type AppStateType = ReturnType<RootReducerType>  // ReturnType вытаскивает возвращаемое из функции значение
+export type AppStateType = {
+    auth: AuthInitialStateType
+    todo: TodoInitialStateType
+}
 
 
 // typization for actions

@@ -61,14 +61,17 @@ type todoAPIReturnType = {
 
 export const todoAPI = {
     async syncTodo(todoState: TodoAPIInitialStateType): Promise<todoAPIReturnType>  {
-        const body = JSON.stringify(todoState)
+        const token = JSON.parse(localStorage.userData)
+        const reqPayload = {...todoState, ...token}
+        const body = JSON.stringify(reqPayload)
 
+        //@ts-ignore
         const response = await fetch('/api/todo/sync_todo', {method:'POST', body, headers: {'Content-Type': 'application/json'} })
         return response.json()
     },
     async getTodo(): Promise<GetTodoReturnType> {
-
-        const response = await fetch('/api/todo/get_todo') //возможно нужно добавить заголовок, чтобы возвращаемая информация адекватно выводилась
+        const body = localStorage.userData
+        const response = await fetch('/api/todo/get_todo', {method:'POST', body, headers: {'Content-Type': 'application/json'}}) //возможно нужно добавить заголовок, чтобы возвращаемая информация адекватно выводилась
         return response.json()
     }
 }
