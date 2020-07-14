@@ -1,8 +1,7 @@
 import {LoginFormDataType} from "../pages/login/AuthPage";
 
-
-interface LoginReturnAdditions {
-    token: string | null,
+interface DefaultReturnType {
+    statusCode: number,
     message: string | null
 }
 
@@ -13,20 +12,22 @@ export interface AuthDataType {
     lastname: string,
     nickname: string
 }
-
-interface AuthAPIReturnType {
-    statusCode: number,
+interface AuthAPIReturnTypeAddition {
     authData: AuthDataType
 }
 
+interface LoginReturnAddition {
+    token: string | null
+}
+
 export const authAPI = {
-    async login(formData: LoginFormDataType): Promise<AuthAPIReturnType & LoginReturnAdditions>  {
+    async login(formData: LoginFormDataType): Promise<DefaultReturnType & AuthAPIReturnTypeAddition & LoginReturnAddition>  {
         const body = JSON.stringify(formData)
 
         const response = await fetch('/api/auth/login', {method:'POST', body, headers: {'Content-Type': 'application/json'} })
         return response.json()
     },
-    async me(token: string): Promise<AuthAPIReturnType> {
+    async me(token: string): Promise<DefaultReturnType & AuthAPIReturnTypeAddition> {
         const body = JSON.stringify(token)
 
         const response = await fetch('/api/auth/me', {method:'POST', body, headers: {'Content-Type': 'application/json'}})
@@ -47,31 +48,24 @@ export type TodoAPIInitialStateType = {
         [key: string]: Array<ContentItemType>
     }
 }
-export type GetTodoReturnType = {
-    statusCode: number,
-    message: string | null
+export type GetTodoReturnTypeAddition = {
     todoData: TodoAPIInitialStateType
 }
-type todoAPIReturnType = {
-    statusCode: number,
-    message: string | null
-}
-
 
 
 export const todoAPI = {
-    async syncTodo(todoState: TodoAPIInitialStateType): Promise<todoAPIReturnType>  {
+    async syncTodo(todoState: TodoAPIInitialStateType): Promise<DefaultReturnType>  {
         const token = JSON.parse(localStorage.userData)
         const reqPayload = {...todoState, ...token}
         const body = JSON.stringify(reqPayload)
 
         //@ts-ignore
-        const response = await fetch('/api/todo/sync_todo', {method:'POST', body, headers: {'Content-Type': 'application/json'} })
+        const response = await fetch('/api/todo/sync_todo', {method:'POST', body, headers: {'Content-Type': 'application/json'}})
         return response.json()
     },
-    async getTodo(): Promise<GetTodoReturnType> {
+    async getTodo(): Promise<DefaultReturnType & GetTodoReturnTypeAddition> {
         const body = localStorage.userData
-        const response = await fetch('/api/todo/get_todo', {method:'POST', body, headers: {'Content-Type': 'application/json'}}) //возможно нужно добавить заголовок, чтобы возвращаемая информация адекватно выводилась
+        const response = await fetch('/api/todo/get_todo', {method:'POST', body, headers: {'Content-Type': 'application/json'}})
         return response.json()
     }
 }

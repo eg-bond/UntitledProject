@@ -20,7 +20,7 @@ export const authReduser = (state = initialState, action: ActionsTypes): AuthIni
         case "SET_AUTH_DATA":
             return {
                 ...state,
-                ...action.loginData,
+                ...action.authData,
                 isAuth: true
             }
         case "FETCH_IN_PROGRESS":
@@ -50,7 +50,7 @@ type ThunkType = ThunkAction<Promise<void>, AppStateType, unknown, ActionsTypes>
 
 export const authActions = {
     fetchInProgress: (inProgress: boolean) => ({type: "FETCH_IN_PROGRESS", inProgress}) as const,
-    setAuthData: (authData: AuthDataType) => ({type: "SET_AUTH_DATA", loginData: authData}) as const,
+    setAuthData: (authData: AuthDataType) => ({type: "SET_AUTH_DATA", authData}) as const,
     logout: () => ({type: "LOGOUT"}) as const
 }
 

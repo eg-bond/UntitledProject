@@ -25,10 +25,10 @@ router.post(
                 await todo.save()
             }
 
-            res.status(201).json({message: 'Синхронизация todo прошла успешно'})
+            res.status(201).json({statusCode: 0, message: 'Синхронизация todo прошла успешно'})
 
         } catch (e) {
-            res.status(500).json({message: 'Что-то пошло не так, попробуйте снова'}) //посмотреть коды ошибок
+            res.status(500).json({statusCode: 1, message: 'Что-то пошло не так, попробуйте снова'}) //посмотреть коды ошибок
         }
     });
 
@@ -45,7 +45,10 @@ router.post(
             const todo = await Todo.findOne({owner: userId})
 
             if (!todo) {
-                return res.status(400).json({message: 'Инфа не найдена'})
+                return res.status(204).json({
+                    statusCode: 11,
+                    message: 'todo is empty',
+                })
             }
 
             const {idGenerator,todoListArr, todoContentObj} = todo

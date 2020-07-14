@@ -72,9 +72,9 @@ export const todoReduser = (state = initialState, action: ActionsTypes): TodoIni
                 todoContentObj: {...action.todoData.todoContentObj},
             }
         case 'todo/ADD_TODO':
-            state.idGenerator++;
             return {
                 ...state,
+                idGenerator: ++state.idGenerator,
                 todoListArr: [...state.todoListArr, {title: "todo without name", id: `eg_bond_todo${state.idGenerator}`}],
                 todoContentObj: {...state.todoContentObj, [`eg_bond_todo${state.idGenerator}`]: []}
             }
