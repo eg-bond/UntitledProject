@@ -36,6 +36,14 @@ import { authActions } from './authReduser'
 //     }
 // }
 
+// export type FormattingType = {
+//   fontSize: string
+//   bold: boolean
+//   italic: boolean
+//   underline: boolean
+//   selectionColor: string
+// }
+
 type TodoContentObjType = {
   [key: string]: Array<{
     value: string

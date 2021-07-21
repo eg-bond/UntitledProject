@@ -4,8 +4,28 @@ import { compose } from 'redux'
 import { AppStateType } from '../../redux/store'
 import { actions, TodoInitialStateType } from '../../redux/todoReduser'
 import { NavLink, useParams, useHistory, withRouter } from 'react-router-dom'
-import { TodoInput } from './TodoInput'
+// import { TodoInput } from './TodoInput'
 import { todoAPI } from '../../api/api'
+
+// const ImportanceBtn: React.FC<{ contentItem: any; color: string }> = ({
+//   contentItem,
+//   color,
+// }) => {
+//   return (
+//     <button
+//       onClick={() =>
+//         modifyTodoContent(
+//           todoId,
+//           contentItem.value,
+//           color,
+//           contentItem.orderNum
+//         )
+//       }
+//       className='selectedTodo__btn'>
+//       {color}
+//     </button>
+//   )
+// }
 
 const ToDoPage: React.FC<
   MapStateToPropsType & MapDispatchToPropsType & WithRouterPropsType
@@ -98,7 +118,7 @@ const ToDoPage: React.FC<
   }
 
   useEffect(() => {
-    console.log(props.match.url)
+    // console.log(props.match.url)
 
     return () => {
       // console.log(props.match.url)
@@ -109,10 +129,27 @@ const ToDoPage: React.FC<
         todoListArr: currentTodoState.todoListArr,
         todoContentObj: currentTodoState.todoContentObj,
       }
-      console.log(body)
+      // console.log(body)
       todoAPI.syncTodo(body)
     }
   }, [])
+
+  const importanceBtn = (contentItem: any, color: string) => {
+    return (
+      <button
+        onClick={() =>
+          modifyTodoContent(
+            todoId,
+            contentItem.value,
+            color,
+            contentItem.orderNum
+          )
+        }
+        className='selectedTodo__btn'>
+        {color}
+      </button>
+    )
+  }
 
   return (
     <div>
@@ -151,54 +188,14 @@ const ToDoPage: React.FC<
                   orderNum={contentItem.orderNum}
                 />
                 {/*<TodoInput todoId={todoId} modifyTodoContent={modifyTodoContent} value={contentItem.value} importance={contentItem.importance} orderNum={contentItem.orderNum}/>*/}
-                <button
-                  onClick={() =>
-                    modifyTodoContent(
-                      todoId,
-                      contentItem.value,
-                      'red',
-                      contentItem.orderNum
-                    )
-                  }
-                  className='selectedTodo__btn'>
-                  red
-                </button>
-                <button
-                  onClick={() =>
-                    modifyTodoContent(
-                      todoId,
-                      contentItem.value,
-                      'yellow',
-                      contentItem.orderNum
-                    )
-                  }
-                  className='selectedTodo__btn'>
-                  yel
-                </button>
-                <button
-                  onClick={() =>
-                    modifyTodoContent(
-                      todoId,
-                      contentItem.value,
-                      'green',
-                      contentItem.orderNum
-                    )
-                  }
-                  className='selectedTodo__btn'>
-                  grn
-                </button>
-                <button
-                  onClick={() =>
-                    modifyTodoContent(
-                      todoId,
-                      contentItem.value,
-                      'noth',
-                      contentItem.orderNum
-                    )
-                  }
-                  className='selectedTodo__btn'>
-                  noth
-                </button>
+                {importanceBtn(contentItem, 'red')}
+                {importanceBtn(contentItem, 'yellow')}
+                {importanceBtn(contentItem, 'green')}
+                {importanceBtn(contentItem, 'noth')}
+                {/* <ImportanceBtn contentItem={contentItem} color={'red'} />
+                <ImportanceBtn contentItem={contentItem} color={'yellow'} />
+                <ImportanceBtn contentItem={contentItem} color={'green'} />
+                <ImportanceBtn contentItem={contentItem} color={'noth'} /> */}
                 <button
                   onClick={() =>
                     deleteTodoContentItem(todoId, contentItem.orderNum)

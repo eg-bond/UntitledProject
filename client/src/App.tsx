@@ -8,6 +8,7 @@ import Navbar from './components/Navbar'
 import { Routes } from './components/Routes'
 import { AppStateType } from './redux/store'
 import { getTodo } from './redux/todoReduser'
+import Toolbar from './components/Toolbar'
 
 const App: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({
   isAuth,
@@ -38,20 +39,12 @@ const App: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({
   return (
     <div>
       <Navbar isAuth={isAuth} logout={logout} name={name} lastname={lastname} />
+      <Toolbar isAuth={isAuth} />
       <div>
         <Routes isAuth={isAuth} />
       </div>
     </div>
   )
-  //   return (
-  //       <div>
-  //           <Navbar isAuth={isAuth} logout={logout} name={name} lastname={lastname} />
-  //           <div>
-  //               <Routes isAuth={isAuth}/>
-  //           </div>
-  //       </div>
-
-  //   );
 }
 
 type mapStateToPropsType = {
