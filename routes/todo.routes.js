@@ -1,77 +1,87 @@
-const {Router} = require('express');
-const config = require('config');
-const User = require('../models/User');
-const Todo = require('../models/Todo');
-const jwt = require('jsonwebtoken');
-const router = Router();
+const { Router } = require('express')
+const config = require('config')
+const User = require('../models/User')
+const Todo = require('../models/Todo')
+const jwt = require('jsonwebtoken')
+const router = Router()
 
 router.post(
-    '/sync_todo', //эндпоинт
+  '/sync_todo', //эндпоинт
 
-    async (req, res) => {
-        try {
-            const {idGenerator, todoListArr, todoContentObj, token} = req.body
+  async (req, res) => {
+    try {
+      const { idGenerator, todoListArr, todoContentObj, token } = req.body
 
-            const decoded = jwt.verify(token, config.get('jwtSecret'))
-            const {userId} = decoded
+      const decoded = jwt.verify(token, config.get('jwtSecret'))
+      const { userId } = decoded
 
-            const user = await User.findOne({_id: userId})
-            const todo = await Todo.findOne({owner: userId})
+      const user = await User.findOne({ _id: userId })
+      const todo = await Todo.findOne({ owner: userId })
 
-            if (todo) {
-                await todo.updateOne({idGenerator, todoListArr, todoContentObj})
-            } else {
-                const todo = new Todo({idGenerator, todoListArr, todoContentObj, owner: user.id});
-                await todo.save()
-            }
+      if (todo) {
+        await todo.updateOne({ idGenerator, todoListArr, todoContentObj })
+      } else {
+        const todo = new Todo({
+          idGenerator,
+          todoListArr,
+          todoContentObj,
+          owner: user.id,
+        })
+        await todo.save()
+      }
 
-            res.status(201).json({statusCode: 0, message: 'Синхронизация todo прошла успешно'})
-
-        } catch (e) {
-            res.status(500).json({statusCode: 1, message: 'Что-то пошло не так, попробуйте снова'}) //посмотреть коды ошибок
-        }
-    });
+      res
+        .status(201)
+        .json({ statusCode: 0, message: 'Синхронизация todo прошла успешно' })
+    } catch (e) {
+      res
+        .status(500)
+        .json({
+          statusCode: 1,
+          message: 'Что-то пошло не так, попробуйте снова',
+        })
+    }
+  }
+)
 
 router.post(
-    '/get_todo', //эндпоинт
+  '/get_todo', //эндпоинт
 
-    async (req, res) => {
-        try {
-            const {token} = req.body
+  async (req, res) => {
+    try {
+      const { token } = req.body
 
-            const decoded = jwt.verify(token, config.get('jwtSecret'))
-            const {userId} = decoded
+      const decoded = jwt.verify(token, config.get('jwtSecret'))
+      const { userId } = decoded
 
-            const todo = await Todo.findOne({owner: userId})
+      const todo = await Todo.findOne({ owner: userId })
 
-            if (!todo) {
-                return res.status(204).json({
-                    statusCode: 11,
-                    message: 'todo is empty',
-                })
-            }
+      if (!todo) {
+        return res.status(204).json({
+          statusCode: 11,
+          message: 'todo is empty',
+        })
+      }
 
-            const {idGenerator,todoListArr, todoContentObj} = todo
+      const { idGenerator, todoListArr, todoContentObj } = todo
 
-            res.json({
-                statusCode: 0,
-                message: null,
-                todoData: {
-                    idGenerator,
-                    todoListArr,
-                    todoContentObj
-                }
+      res.json({
+        statusCode: 0,
+        message: null,
+        todoData: {
+          idGenerator,
+          todoListArr,
+          todoContentObj,
+        },
+      })
+    } catch (e) {
+      res.status(500).json({
+        statusCode: 1,
+        message: 'Что-то пошло не так, попробуйте снова',
+        todoData: null,
+      })
+    }
+  }
+)
 
-            })
-
-        } catch (e) {
-            res.status(500).json({
-                statusCode: 1,
-                message: 'Что-то пошло не так, попробуйте снова',
-                todoData: null
-            })
-        }
-    });
-
-
-module.exports = router;
+module.exports = router

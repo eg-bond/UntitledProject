@@ -20,6 +20,7 @@ const App: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({
   getTodo,
 }) => {
   //if token in LS exists - get userData from server
+
   useEffect(() => {
     // @ts-ignore
     let token

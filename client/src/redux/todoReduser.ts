@@ -250,7 +250,7 @@ export const actions = {
 export const getTodo = (): ThunkType => {
   return async dispatch => {
     //@ts-ignore
-    dispatch(authActions.fetchInProgress(true)) // из authReduser
+    // dispatch(authActions.fetchInProgress(true)) // из authReduser
 
     let responseData = await todoAPI.getTodo()
 
@@ -258,7 +258,7 @@ export const getTodo = (): ThunkType => {
       dispatch(actions.setInitialTodoData(responseData.todoData))
     }
     //@ts-ignore
-    dispatch(authActions.fetchInProgress(false))
+    // dispatch(authActions.fetchInProgress(false))
   }
 }
 

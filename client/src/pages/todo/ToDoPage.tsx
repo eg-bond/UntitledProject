@@ -2,7 +2,7 @@ import React, { useEffect, useState } from 'react'
 import { connect, useStore } from 'react-redux'
 import { compose } from 'redux'
 import { AppStateType } from '../../redux/store'
-import { actions, TodoInitialStateType } from '../../redux/todoReduser'
+import { actions, getTodo, TodoInitialStateType } from '../../redux/todoReduser'
 import { NavLink, useParams, useHistory, withRouter } from 'react-router-dom'
 // import { TodoInput } from './TodoInput'
 import { todoAPI } from '../../api/api'
@@ -120,6 +120,7 @@ const ToDoPage: React.FC<
   useEffect(() => {
     // console.log(props.match.url)
 
+    // getTodo()
     return () => {
       // console.log(props.match.url)
       let currentTodoState = currentStore.getState().todo
