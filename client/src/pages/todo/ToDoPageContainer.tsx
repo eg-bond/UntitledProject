@@ -10,13 +10,16 @@ import ToDoPageNew from './ToDoPageNew'
 const ToDoPageContainer: React.FC<
   MapStateToPropsType & MapDispatchToPropsType & WithRouterPropsType
 > = ({
-  todoListArr,
+  // todoListArr,
+  todoTitles,
   selectedTodo,
+  todoContent,
   addTodo,
   deleteTodo,
   addTodoContentItem,
   deleteTodoContentItem,
   selectTodo,
+  selectContentItem,
   modifyTodoContent,
   ...props
 }) => {
@@ -28,18 +31,18 @@ const ToDoPageContainer: React.FC<
   const deleteTodoHandler = (thisTodoId: string) => {
     deleteTodo(thisTodoId)
 
-    if (todoId === thisTodoId) {
-      let index = todoListArr.findIndex(item => item.id === thisTodoId)
+    // if (todoId === thisTodoId) {
+    //   let index = todoListArr.findIndex(item => item.id === thisTodoId)
 
-      let nextTodoUrl = () =>
-        index === 0
-          ? history.push(`/todo/${todoListArr[index + 1].id}`)
-          : history.push(`/todo/${todoListArr[index - 1].id}`)
+    //   let nextTodoUrl = () =>
+    //     index === 0
+    //       ? history.push(`/todo/${todoListArr[index + 1].id}`)
+    //       : history.push(`/todo/${todoListArr[index - 1].id}`)
 
-      let emptyTodoUrl = () => history.push(`/todo`)
+    //   let emptyTodoUrl = () => history.push(`/todo`)
 
-      todoListArr.length > 1 ? nextTodoUrl() : emptyTodoUrl()
-    }
+    //   todoListArr.length > 1 ? nextTodoUrl() : emptyTodoUrl()
+    // }
   }
 
   type ContentItemType = {
@@ -70,13 +73,16 @@ const ToDoPageContainer: React.FC<
 
   return (
     <ToDoPageNew
-      todoListArr={todoListArr}
+      // todoListArr={todoListArr}
+      todoTitles={todoTitles}
+      todoContent={todoContent}
       selectedTodo={selectedTodo}
       addTodo={addTodo}
       deleteTodo={deleteTodo}
       addTodoContentItem={addTodoContentItem}
       deleteTodoContentItem={deleteTodoContentItem}
       selectTodo={selectTodo}
+      selectContentItem={selectContentItem}
       modifyTodoContent={modifyTodoContent}
       changeTodoTitle={props.changeTodoTitle}
       deleteTodoHandler={deleteTodoHandler}
@@ -86,9 +92,10 @@ const ToDoPageContainer: React.FC<
 
 const mapStateToProps = (state: AppStateType): MapStateToPropsType => ({
   idGenerator: state.todo.idGenerator,
-  todoListArr: state.todo.todoListArr,
-  todoContentObj: state.todo.todoContentObj,
-  selectedTodo: state.todo.selectedTodo,
+  todoTitles: state.todo.todoTitles,
+  todoContent: state.todo.todoContent,
+  currentTodoId: state.todo.currentTodoId,
+  selectedContentItem: state.todo.selectedContentItem,
 })
 
 export default compose(
@@ -103,6 +110,7 @@ export default compose(
     addTodoContentItem: actions.addTodoContentItem,
     deleteTodoContentItem: actions.deleteTodoContentItem,
     selectTodo: actions.selectTodo,
+    selectContentItem: actions.selectContentItem,
     changeTodoTitle: actions.changeTodoTitle,
     modifyTodoContent: actions.modifyTodoContent,
   }),

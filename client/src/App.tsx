@@ -29,7 +29,7 @@ const App: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({
     }
     if (!!token) {
       getAuthData(token)
-      getTodo()
+      // getTodo()
     }
   }, [])
 

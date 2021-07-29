@@ -2,38 +2,37 @@ import React, { useState } from 'react'
 
 type InputType = {
   value: string
-  importance: string
-  orderNum: number
+  color: string
+  order: number
   modifyTodoContent: any
   todoId: string
+  selectContentItem: any
 }
 
 export const TodoInput: React.FC<InputType> = props => {
-  const importanceClass = (imp: string): string => {
-    return imp === 'red'
+  const clrClass = (clr: string): string => {
+    return clr === 'red'
       ? 'redImp'
-      : imp === 'yellow'
+      : clr === 'yellow'
       ? 'yellowImp'
-      : imp === 'green'
+      : clr === 'green'
       ? 'greenImp'
       : ''
   }
+
+  console.log(props.order)
 
   const [insideValue, changeInsideValue] = useState(props.value)
 
   return (
     <input
-      className={importanceClass(props.importance)}
+      className={clrClass(props.color)}
       onChange={e => changeInsideValue(e.target.value)}
       value={insideValue}
       onKeyDown={(e: any) => e.key === 'Enter' && e.target.blur()}
+      onFocus={() => props.selectContentItem(props.order)}
       onBlur={() =>
-        props.modifyTodoContent(
-          props.todoId,
-          insideValue,
-          props.importance,
-          props.orderNum
-        )
+        props.modifyTodoContent(props.todoId, props.order, { insideValue })
       }
     />
   )
