@@ -80,9 +80,9 @@ export const todoReduser = (
       return {
         ...state,
         idGenerator: action.todoData.idGenerator,
-        todoListArr: [...action.todoData.todoListArr],
+        todoListArr: action.todoData.todoListArr,
         //@ts-ignore
-        todoContentObj: { ...action.todoData.todoContentObj },
+        todoContentObj: action.todoData.todoContentObj,
       }
     case 'todo/ADD_TODO':
       return {
@@ -112,8 +112,8 @@ export const todoReduser = (
       }
       return {
         ...state,
-        todoListArr: [...redusedtodoListArr],
-        todoContentObj: { ...redusedTodoContentObj },
+        todoListArr: redusedtodoListArr,
+        todoContentObj: redusedTodoContentObj,
       }
     case 'todo/ADD_TODO_CONTENT_ITEM':
       let newContent = [
