@@ -11,7 +11,6 @@ export type DeleteTodoHandlerType = {
 }
 
 const ContentDiv = props => {
-  console.log('r')
   // const [insideValue, changeInsideValue] = useState(props.value)
   return <div>{props.value}</div>
 }
@@ -36,7 +35,7 @@ const ToDoPageNew: React.FC<
 }) => {
   // @ts-ignore
   let { todoId } = useParams()
-  console.log(selectedTodo)
+  console.log(currentTodoId)
 
   const [localTodoTitle, setLocalTodoTitle] = useState('')
 

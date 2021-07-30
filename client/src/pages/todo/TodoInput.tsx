@@ -20,22 +20,30 @@ export const TodoInput: React.FC<InputType> = props => {
       : ''
   }
 
-  // console.log(props.order)
-
   const [insideValue, changeInsideValue] = useState(props.value)
+  const [focused, switchFocus] = useState(false)
+
+  const focusHandler = (order, value) => {
+    changeInsideValue(value)
+    props.selectContentItem(order)
+    switchFocus(true)
+  }
+
+  const blurHandler = () => {
+    props.modifyTodoContent(props.todoId, props.order, {
+      value: insideValue,
+    })
+    switchFocus(false)
+  }
 
   return (
     <input
       className={clrClass(props.color)}
       onChange={e => changeInsideValue(e.target.value)}
-      value={insideValue}
+      value={focused ? insideValue : props.value}
       onKeyDown={(e: any) => e.key === 'Enter' && e.target.blur()}
-      onFocus={() => props.selectContentItem(props.order)}
-      onBlur={() =>
-        props.modifyTodoContent(props.todoId, props.order, {
-          value: insideValue,
-        })
-      }
+      onFocus={() => focusHandler(props.order, props.value)}
+      onBlur={() => blurHandler()}
     />
   )
 }

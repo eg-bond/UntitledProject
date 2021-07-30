@@ -73,7 +73,6 @@ export const todoReduser = (
   action: ActionsTypes
 ): TodoInitialStateType => {
   switch (action.type) {
-    //done
     case 'todo/SET_INITIAL_TODO_DATA':
       return {
         ...state,
@@ -81,7 +80,6 @@ export const todoReduser = (
         todoTitles: action.todoData.todoTitles,
         todoContent: action.todoData.todoContent,
       }
-    //done
     case 'todo/ADD_TODO':
       return {
         ...state,
@@ -95,14 +93,12 @@ export const todoReduser = (
           [`eg_bond_todo${state.idGenerator}`]: [],
         },
       }
-    //done
     case 'todo/DELETE_TODO':
       let newS = { ...state }
       delete newS.todoTitles[action.todoId]
       delete newS.todoContent[action.todoId]
 
       return newS
-    //done
     case 'todo/ADD_TODO_CONTENT_ITEM':
       let newContent = [
         ...state.todoContent[action.todoId],
@@ -119,54 +115,49 @@ export const todoReduser = (
           [action.todoId]: newContent,
         },
       }
-
     case 'todo/DELETE_TODO_CONTENT_ITEM':
-      let redusedContent = [...state.todoContent[action.todoId]]
-      // console.log(action.order)
-      redusedContent.splice(action.order, 1)
-      // console.log(redusedContent)
-      for (let i = 0; i <= redusedContent.length - 1; i++) {
-        //упорядочиваем itemId
-        redusedContent[i].order = i
+      let redusedTodo = [...state.todoContent[action.todoId]]
+      redusedTodo.splice(action.order, 1)
+
+      for (let i = 0; i <= redusedTodo.length - 1; i++) {
+        //упорядочиваем order
+        redusedTodo[i].order = i
       }
       return {
         ...state,
         todoContent: {
           ...state.todoContent,
-          [action.todoId]: redusedContent,
+          [action.todoId]: redusedTodo,
         },
       }
-    //done
     case 'todo/SELECT_TODO':
       return {
         ...state,
         currentTodoId: action.todoId,
       }
-    //done
     case 'todo/SELECT_CONTENT_ITEM':
-      console.log('select')
       return {
         ...state,
+        selectedContentItem: action.order,
       }
-    // return {
-    //   ...state,
-    //   selectedContentItem: action.order,
-    // }
-    //done
     case 'todo/CHANGE_TODO_TITLE':
       return {
         ...state,
         todoTitles: { ...state.todoTitles, [action.todoId]: action.title },
       }
-    //done
     case 'todo/MODIFY_TODO_CONTENT':
-      let newState = { ...state }
+      let newState = {
+        ...state,
+        todoContent: {
+          ...state.todoContent,
+        },
+      }
       newState.todoContent[action.todoId][action.order] = {
         ...state.todoContent[action.todoId][action.order],
         ...action.itemProps,
       }
-      console.log(state === newState)
-      return { ...state, ...newState }
+
+      return newState
 
     default:
       return state
