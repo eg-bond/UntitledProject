@@ -10,21 +10,14 @@ export type DeleteTodoHandlerType = {
   deleteTodoHandler: (thisTodoId: string) => void
 }
 
-const ContentDiv = props => {
-  // const [insideValue, changeInsideValue] = useState(props.value)
-  return <div>{props.value}</div>
-}
-
 const ToDoPageNew: React.FC<
   MapStateToPropsType & MapDispatchToPropsType & DeleteTodoHandlerType
 > = ({
-  // todoListArr,
   todoTitles,
   selectedTodo,
   currentTodoId,
   todoContent,
   addTodo,
-  // deleteTodo,
   addTodoContentItem,
   deleteTodoContentItem,
   selectTodo,
@@ -46,22 +39,22 @@ const ToDoPageNew: React.FC<
     }
   }, [todoId, currentTodoId])
 
-  const importanceBtn = (contentItem: any, color: string) => {
-    return (
-      <button
-        onClick={() =>
-          modifyTodoContent(
-            todoId,
-            contentItem.value,
-            color,
-            contentItem.orderNum
-          )
-        }
-        className='selectedTodo__btn'>
-        {color}
-      </button>
-    )
-  }
+  // const importanceBtn = (contentItem: any, color: string) => {
+  //   return (
+  //     <button
+  //       onClick={() =>
+  //         modifyTodoContent(
+  //           todoId,
+  //           contentItem.value,
+  //           color,
+  //           contentItem.orderNum
+  //         )
+  //       }
+  //       className='selectedTodo__btn'>
+  //       {color}
+  //     </button>
+  //   )
+  // }
 
   let titlesEntriesArr = Object.entries(todoTitles)
 
@@ -113,46 +106,11 @@ const ToDoPageNew: React.FC<
                 </button>
               </div>
             ))}
-            {todoContent[todoId].map(contentItem => (
-              <div key={`${todoId}_${contentItem.order}_111`}>
-                <ContentDiv value={contentItem.value} />
-              </div>
-            ))}
             <button onClick={() => addTodoContentItem(todoId)}>
               Add todo item
             </button>
           </div>
         )}
-
-        {/* <div className='selectedTodo__items'>
-          {selectedTodo.content.map(contentItem => (
-            <div
-              key={`${todoId}_${contentItem.orderNum}`}
-              className='selectedTodo__item'>
-              <TodoInput
-                value={contentItem.value}
-                importance={contentItem.importance}
-                orderNum={contentItem.orderNum}
-                todoId={todoId}
-                modifyTodoContent={modifyTodoContent}
-              />
-              {importanceBtn(contentItem, 'red')}
-              {importanceBtn(contentItem, 'yellow')}
-              {importanceBtn(contentItem, 'green')}
-              {importanceBtn(contentItem, 'noth')}
-              <button
-                onClick={() =>
-                  deleteTodoContentItem(todoId, contentItem.orderNum)
-                }
-                className='selectedTodo__btn'>
-                del
-              </button>
-            </div>
-          ))}
-          <button onClick={() => addTodoContentItem(todoId, '', 'noth')}>
-            Add todo item
-          </button>
-        </div> */}
       </div>
     </div>
   )

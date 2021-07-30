@@ -6,6 +6,7 @@ import { actions, TodoInitialStateType } from '../../redux/todoReduser'
 import { useParams, useHistory, withRouter } from 'react-router-dom'
 import { todoAPI } from '../../api/api'
 import ToDoPageNew from './ToDoPageNew'
+import TodoToolbar from '../../components/TodoToolbar'
 
 const ToDoPageContainer: React.FC<
   MapStateToPropsType & MapDispatchToPropsType & WithRouterPropsType
@@ -28,10 +29,10 @@ const ToDoPageContainer: React.FC<
   // @ts-ignore
   let { todoId } = useParams()
   let currentStore = useStore()
+  let idArr = Object.keys(todoTitles)
 
   const deleteTodoHandler = (thisTodoId: string) => {
     if (todoId === thisTodoId) {
-      let idArr = Object.keys(todoTitles)
       let index = idArr.findIndex(item => item === thisTodoId)
 
       let nextTodoUrl = () =>
@@ -60,6 +61,10 @@ const ToDoPageContainer: React.FC<
   }
 
   useEffect(() => {
+    if (idArr[0]) {
+      history.push(`/todo/${idArr[0]}`)
+    }
+
     return () => {
       let currentTodoState = currentStore.getState().todo
 
@@ -73,22 +78,25 @@ const ToDoPageContainer: React.FC<
   }, [])
 
   return (
-    <ToDoPageNew
-      // todoListArr={todoListArr}
-      todoTitles={todoTitles}
-      todoContent={todoContent}
-      selectedTodo={selectedTodo}
-      currentTodoId={currentTodoId}
-      addTodo={addTodo}
-      deleteTodo={deleteTodo}
-      addTodoContentItem={addTodoContentItem}
-      deleteTodoContentItem={deleteTodoContentItem}
-      selectTodo={selectTodo}
-      selectContentItem={selectContentItem}
-      modifyTodoContent={modifyTodoContent}
-      changeTodoTitle={props.changeTodoTitle}
-      deleteTodoHandler={deleteTodoHandler}
-    />
+    <>
+      <TodoToolbar todoId={todoId} modifyTodoContent={modifyTodoContent} />
+      <ToDoPageNew
+        // todoListArr={todoListArr}
+        todoTitles={todoTitles}
+        todoContent={todoContent}
+        selectedTodo={selectedTodo}
+        currentTodoId={currentTodoId}
+        addTodo={addTodo}
+        deleteTodo={deleteTodo}
+        addTodoContentItem={addTodoContentItem}
+        deleteTodoContentItem={deleteTodoContentItem}
+        selectTodo={selectTodo}
+        selectContentItem={selectContentItem}
+        modifyTodoContent={modifyTodoContent}
+        changeTodoTitle={props.changeTodoTitle}
+        deleteTodoHandler={deleteTodoHandler}
+      />
+    </>
   )
 }
 

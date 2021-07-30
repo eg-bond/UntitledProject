@@ -30,7 +30,7 @@ export const TodoInput: React.FC<InputType> = props => {
   }
 
   const blurHandler = () => {
-    props.modifyTodoContent(props.todoId, props.order, {
+    props.modifyTodoContent(props.todoId, {
       value: insideValue,
     })
     switchFocus(false)

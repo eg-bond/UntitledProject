@@ -7,6 +7,7 @@ import ToDoPage from '../pages/todo/ToDoPage'
 // import ToDoPageWithLocalContent from "../pages/todo/ToDoPageWithLocalContent";
 import DiaryPage from '../pages/diary/DiaryPage'
 import ToDoPageContainer from '../pages/todo/ToDoPageContainer'
+import TodoToolbar from './TodoToolbar'
 
 export const Routes = ({ isAuth }) => {
   if (isAuth) {
@@ -19,7 +20,6 @@ export const Routes = ({ isAuth }) => {
         <Route path='/todo/:todoId?'>
           <ToDoPageContainer />
         </Route>
-        {/*<Route path="/todolocal/:todoId?"><ToDoPageWithLocalContent/></Route>*/}
         <Route path='/diary'>
           <DiaryPage />
         </Route>

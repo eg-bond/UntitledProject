@@ -152,12 +152,14 @@ export const todoReduser = (
           ...state.todoContent,
         },
       }
-      newState.todoContent[action.todoId][action.order] = {
-        ...state.todoContent[action.todoId][action.order],
+      newState.todoContent[action.todoId][state.selectedContentItem] = {
+        ...state.todoContent[action.todoId][state.selectedContentItem],
         ...action.itemProps,
       }
 
       return newState
+    //ToolbarActions-------------------------
+    // case 'todo/CHANGE_COLOR'
 
     default:
       return state
@@ -186,7 +188,7 @@ export const actions = {
     ({ type: 'todo/CHANGE_TODO_TITLE', todoId, title } as const),
   modifyTodoContent: (
     todoId: string,
-    order: number,
+    // order: number,
     itemProps: {
       value?: string
       color?: string
@@ -199,11 +201,13 @@ export const actions = {
     ({
       type: 'todo/MODIFY_TODO_CONTENT',
       todoId,
-      order,
+      // order,
       itemProps,
     } as const),
   setInitialTodoData: (todoData: TodoAPIInitialStateType) =>
     ({ type: 'todo/SET_INITIAL_TODO_DATA', todoData } as const),
+  clearFormatting: (todoId: string) =>
+    ({ type: 'todo/CLEAR_FORMATTING', todoId } as const),
 }
 
 export const getTodo = (): ThunkType => {
