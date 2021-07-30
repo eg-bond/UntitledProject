@@ -20,7 +20,7 @@ export const TodoInput: React.FC<InputType> = props => {
       : ''
   }
 
-  console.log(props.order)
+  // console.log(props.order)
 
   const [insideValue, changeInsideValue] = useState(props.value)
 
@@ -32,7 +32,9 @@ export const TodoInput: React.FC<InputType> = props => {
       onKeyDown={(e: any) => e.key === 'Enter' && e.target.blur()}
       onFocus={() => props.selectContentItem(props.order)}
       onBlur={() =>
-        props.modifyTodoContent(props.todoId, props.order, { insideValue })
+        props.modifyTodoContent(props.todoId, props.order, {
+          value: insideValue,
+        })
       }
     />
   )

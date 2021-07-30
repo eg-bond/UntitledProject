@@ -14,6 +14,7 @@ const ToDoPageContainer: React.FC<
   todoTitles,
   selectedTodo,
   todoContent,
+  currentTodoId,
   addTodo,
   deleteTodo,
   addTodoContentItem,
@@ -29,22 +30,22 @@ const ToDoPageContainer: React.FC<
   let currentStore = useStore()
 
   const deleteTodoHandler = (thisTodoId: string) => {
+    if (todoId === thisTodoId) {
+      let idArr = Object.keys(todoTitles)
+      let index = idArr.findIndex(item => item === thisTodoId)
+
+      let nextTodoUrl = () =>
+        index === 0
+          ? history.push(`/todo/${idArr[index + 1]}`)
+          : history.push(`/todo/${idArr[index - 1]}`)
+
+      let emptyTodoUrl = () => history.push(`/todo`)
+
+      idArr.length > 1 ? nextTodoUrl() : emptyTodoUrl()
+    }
+
     deleteTodo(thisTodoId)
-
-    // if (todoId === thisTodoId) {
-    //   let index = todoListArr.findIndex(item => item.id === thisTodoId)
-
-    //   let nextTodoUrl = () =>
-    //     index === 0
-    //       ? history.push(`/todo/${todoListArr[index + 1].id}`)
-    //       : history.push(`/todo/${todoListArr[index - 1].id}`)
-
-    //   let emptyTodoUrl = () => history.push(`/todo`)
-
-    //   todoListArr.length > 1 ? nextTodoUrl() : emptyTodoUrl()
-    // }
   }
-
   type ContentItemType = {
     value: string
     importance: string
@@ -77,6 +78,7 @@ const ToDoPageContainer: React.FC<
       todoTitles={todoTitles}
       todoContent={todoContent}
       selectedTodo={selectedTodo}
+      currentTodoId={currentTodoId}
       addTodo={addTodo}
       deleteTodo={deleteTodo}
       addTodoContentItem={addTodoContentItem}

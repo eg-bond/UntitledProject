@@ -10,12 +10,19 @@ export type DeleteTodoHandlerType = {
   deleteTodoHandler: (thisTodoId: string) => void
 }
 
+const ContentDiv = props => {
+  console.log('r')
+  // const [insideValue, changeInsideValue] = useState(props.value)
+  return <div>{props.value}</div>
+}
+
 const ToDoPageNew: React.FC<
   MapStateToPropsType & MapDispatchToPropsType & DeleteTodoHandlerType
 > = ({
   // todoListArr,
   todoTitles,
   selectedTodo,
+  currentTodoId,
   todoContent,
   addTodo,
   // deleteTodo,
@@ -29,14 +36,16 @@ const ToDoPageNew: React.FC<
 }) => {
   // @ts-ignore
   let { todoId } = useParams()
-  console.log(todoId)
+  console.log(selectedTodo)
 
   const [localTodoTitle, setLocalTodoTitle] = useState('')
 
   useEffect(() => {
     selectTodo(todoId)
-    // setLocalTodoTitle(selectedTodo.title)
-  }, [todoId])
+    if (currentTodoId) {
+      setLocalTodoTitle(todoTitles[currentTodoId])
+    }
+  }, [todoId, currentTodoId])
 
   const importanceBtn = (contentItem: any, color: string) => {
     return (
@@ -68,14 +77,6 @@ const ToDoPageNew: React.FC<
             <button onClick={() => deleteTodoHandler(entry[0])}>del</button>
           </div>
         ))}
-        {/* {todoListArr.map(todo => (
-          <div key={todo.id}>
-            <NavLink to={`/todo/${todo.id}`} className='leftBar__item'>
-              {todo.title}
-            </NavLink>
-            <button onClick={() => deleteTodoHandler(todo.id)}>del</button>
-          </div>
-        ))} */}
 
         <button onClick={addTodo} className='leftBar__btn'>
           Add note
@@ -83,13 +84,13 @@ const ToDoPageNew: React.FC<
       </div>
 
       <div className='selectedTodo'>
-        {/* <input
+        <input
           onBlur={() => props.changeTodoTitle(todoId, localTodoTitle)}
           onKeyDown={(e: any) => e.key === 'Enter' && e.target.blur()}
           onChange={e => setLocalTodoTitle(e.target.value)}
           value={localTodoTitle}
           className='selectedTodo__H'
-        /> */}
+        />
         {todoId && (
           <div className='selectedTodo__items'>
             {todoContent[todoId].map(contentItem => (
@@ -104,18 +105,23 @@ const ToDoPageNew: React.FC<
                   modifyTodoContent={modifyTodoContent}
                   selectContentItem={selectContentItem}
                 />
-                {/* <button
-                onClick={() =>
-                  deleteTodoContentItem(todoId, contentItem.orderNum)
-                }
-                className='selectedTodo__btn'>
-                del
-              </button> */}
+                <button
+                  onClick={() =>
+                    deleteTodoContentItem(todoId, contentItem.order)
+                  }
+                  className='selectedTodo__btn'>
+                  del
+                </button>
               </div>
             ))}
-            {/* <button onClick={() => addTodoContentItem(todoId, '', 'noth')}>
-            Add todo item
-          </button> */}
+            {todoContent[todoId].map(contentItem => (
+              <div key={`${todoId}_${contentItem.order}_111`}>
+                <ContentDiv value={contentItem.value} />
+              </div>
+            ))}
+            <button onClick={() => addTodoContentItem(todoId)}>
+              Add todo item
+            </button>
           </div>
         )}
 
