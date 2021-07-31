@@ -54,17 +54,24 @@ const TodoToolbar = ({ todoId, modifyTodoContent }) => {
       <button
         onClick={() =>
           modifyTodoContent(todoId, {
-            color: 'noth',
+            color: 'black',
           })
         }>
         Без цвета
       </button>
-      <button>Выделить</button>
       <button
         onClick={() =>
           modifyTodoContent(todoId, {
-            color: 'noth',
-            selectionClr: 'noth',
+            selectionClr: 'blue',
+          })
+        }>
+        Выделить
+      </button>
+      <button
+        onClick={() =>
+          modifyTodoContent(todoId, {
+            color: 'black',
+            selectionClr: 'white',
             bold: false,
             italic: false,
             underline: false,

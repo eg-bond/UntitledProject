@@ -47,7 +47,7 @@ let initialState: TodoInitialStateType = {
         value: 'bye bread',
         color: 'green',
         selectionClr: 'blue',
-        bold: true,
+        bold: false,
         italic: false,
         underline: false,
       },

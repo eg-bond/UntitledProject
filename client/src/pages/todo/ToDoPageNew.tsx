@@ -96,6 +96,7 @@ const ToDoPageNew: React.FC<
                   todoId={todoId}
                   modifyTodoContent={modifyTodoContent}
                   selectContentItem={selectContentItem}
+                  itemProps={{ ...contentItem }}
                 />
                 <button
                   onClick={() =>
