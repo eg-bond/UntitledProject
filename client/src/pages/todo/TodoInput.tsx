@@ -41,6 +41,7 @@ export const TodoInput: React.FC<InputType> = ({
     modifyTodoContent(todoId, {
       value: insideValue,
     })
+    // selectContentItem(null)
     switchFocus(false)
   }
 

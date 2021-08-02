@@ -1,77 +1,120 @@
 import React from 'react'
 
-const TodoToolbar = ({ todoId, modifyTodoContent }) => {
+const TodoToolbar = ({
+  todoId,
+  todoTitles,
+  modifyTodoContent,
+  todoContent,
+  selectedTodo,
+  selectedContentItem,
+  changeTodoTitle,
+}) => {
+  let contentItem = {
+    order: 1,
+    value: '',
+    color: '',
+    selectionClr: '',
+    bold: false,
+    italic: false,
+    underline: false,
+  }
+
+  if (selectedContentItem === 'title') {
+    contentItem = todoTitles[todoId]
+  } else if (selectedContentItem !== null) {
+    contentItem = todoContent[todoId][selectedContentItem]
+  }
+
+  const { color, bold, italic, underline } = contentItem
+  // console.log(contentItem)
+
+  const modify = (todoId, propsToModify) => {
+    if (selectedContentItem === 'title') {
+      changeTodoTitle(todoId, { ...propsToModify })
+    } else {
+      modifyTodoContent(todoId, { ...propsToModify })
+    }
+  }
   return (
     <div>
       <button
+        style={{ backgroundColor: bold ? 'red' : 'transparent' }}
         onClick={() =>
-          modifyTodoContent(todoId, {
-            bold: true,
+          modify(todoId, {
+            bold: !bold,
           })
         }>
         Ж
       </button>
       <button
+        style={{ backgroundColor: italic ? 'red' : 'transparent' }}
         onClick={() =>
-          modifyTodoContent(todoId, {
-            italic: true,
+          modify(todoId, {
+            italic: !italic,
           })
         }>
         К
       </button>
       <button
+        style={{
+          backgroundColor: underline ? 'red' : 'transparent',
+        }}
         onClick={() =>
-          modifyTodoContent(todoId, {
-            underline: true,
+          modify(todoId, {
+            underline: !underline,
           })
         }>
         Ч
       </button>
       <button
+        style={{
+          backgroundColor: color === 'red' ? 'red' : 'transparent',
+        }}
         onClick={() =>
-          modifyTodoContent(todoId, {
+          modify(todoId, {
             color: 'red',
           })
         }>
         Красный
       </button>
       <button
+        style={{
+          backgroundColor: color === 'yellow' ? 'red' : 'transparent',
+        }}
         onClick={() =>
-          modifyTodoContent(todoId, {
+          modify(todoId, {
             color: 'yellow',
           })
         }>
         Желтый
       </button>
       <button
+        style={{
+          backgroundColor: color === 'green' ? 'red' : 'transparent',
+        }}
         onClick={() =>
-          modifyTodoContent(todoId, {
+          modify(todoId, {
             color: 'green',
           })
         }>
         Зеленый
       </button>
       <button
+        style={{
+          backgroundColor: color === 'black' ? 'red' : 'transparent',
+        }}
         onClick={() =>
-          modifyTodoContent(todoId, {
+          modify(todoId, {
             color: 'black',
           })
         }>
         Без цвета
       </button>
+
       <button
         onClick={() =>
-          modifyTodoContent(todoId, {
-            selectionClr: 'blue',
-          })
-        }>
-        Выделить
-      </button>
-      <button
-        onClick={() =>
-          modifyTodoContent(todoId, {
+          modify(todoId, {
             color: 'black',
-            selectionClr: 'white',
             bold: false,
             italic: false,
             underline: false,

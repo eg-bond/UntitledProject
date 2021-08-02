@@ -16,6 +16,7 @@ const ToDoPageContainer: React.FC<
   selectedTodo,
   todoContent,
   currentTodoId,
+  selectedContentItem,
   addTodo,
   deleteTodo,
   addTodoContentItem,
@@ -79,7 +80,15 @@ const ToDoPageContainer: React.FC<
 
   return (
     <>
-      <TodoToolbar todoId={todoId} modifyTodoContent={modifyTodoContent} />
+      <TodoToolbar
+        todoId={todoId}
+        todoContent={todoContent}
+        todoTitles={todoTitles}
+        selectedTodo={selectedTodo}
+        selectedContentItem={selectedContentItem}
+        modifyTodoContent={modifyTodoContent}
+        changeTodoTitle={props.changeTodoTitle}
+      />
       <ToDoPageNew
         // todoListArr={todoListArr}
         todoTitles={todoTitles}

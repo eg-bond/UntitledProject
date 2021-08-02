@@ -38,7 +38,14 @@ export type TodoInitialStateType = {
 let initialState: TodoInitialStateType = {
   idGenerator: 2,
   todoTitles: {
-    eg_bond_todo1: 'title1',
+    eg_bond_todo1: {
+      value: 'title1',
+      color: 'black',
+      bold: true,
+      italic: false,
+      underline: false,
+    },
+    // eg_bond_todo1: 'title1',
   },
   todoContent: {
     eg_bond_todo1: [
@@ -46,7 +53,7 @@ let initialState: TodoInitialStateType = {
         order: 0,
         value: 'bye bread',
         color: 'green',
-        selectionClr: 'blue',
+        selectionClr: 'transparent',
         bold: false,
         italic: false,
         underline: false,
@@ -55,7 +62,7 @@ let initialState: TodoInitialStateType = {
         order: 1,
         value: 'bye milk',
         color: 'red',
-        selectionClr: 'blue',
+        selectionClr: 'transparent',
         bold: true,
         italic: false,
         underline: false,
@@ -63,7 +70,7 @@ let initialState: TodoInitialStateType = {
     ],
   },
   currentTodoId: null,
-  selectedContentItem: 0,
+  selectedContentItem: null,
 }
 
 // export type TodoInitialStateType = typeof initialState
@@ -86,7 +93,9 @@ export const todoReduser = (
         idGenerator: ++state.idGenerator,
         todoTitles: {
           ...state.todoTitles,
-          [`eg_bond_todo${state.idGenerator}`]: `eb_${state.idGenerator}_title`,
+          [`eg_bond_todo${state.idGenerator}`]: {
+            value: `eb_${state.idGenerator}_title`,
+          },
         },
         todoContent: {
           ...state.todoContent,
@@ -143,7 +152,13 @@ export const todoReduser = (
     case 'todo/CHANGE_TODO_TITLE':
       return {
         ...state,
-        todoTitles: { ...state.todoTitles, [action.todoId]: action.title },
+        todoTitles: {
+          ...state.todoTitles,
+          [action.todoId]: {
+            ...state.todoTitles[action.todoId],
+            ...action.titleProps,
+          },
+        },
       }
     case 'todo/MODIFY_TODO_CONTENT':
       let newState = {
@@ -184,8 +199,8 @@ export const actions = {
     ({ type: 'todo/SELECT_TODO', todoId } as const),
   selectContentItem: (order: number) =>
     ({ type: 'todo/SELECT_CONTENT_ITEM', order } as const),
-  changeTodoTitle: (todoId: string, title: string) =>
-    ({ type: 'todo/CHANGE_TODO_TITLE', todoId, title } as const),
+  changeTodoTitle: (todoId: string, titleProps: Object) =>
+    ({ type: 'todo/CHANGE_TODO_TITLE', todoId, titleProps } as const),
   modifyTodoContent: (
     todoId: string,
     // order: number,

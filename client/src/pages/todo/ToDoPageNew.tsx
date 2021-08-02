@@ -28,43 +28,47 @@ const ToDoPageNew: React.FC<
 }) => {
   // @ts-ignore
   let { todoId } = useParams()
-  console.log(currentTodoId)
+  // console.log(selectContentItem)
 
   const [localTodoTitle, setLocalTodoTitle] = useState('')
 
   useEffect(() => {
     selectTodo(todoId)
     if (currentTodoId) {
-      setLocalTodoTitle(todoTitles[currentTodoId])
+      setLocalTodoTitle(todoTitles[currentTodoId].value)
     }
   }, [todoId, currentTodoId])
 
-  // const importanceBtn = (contentItem: any, color: string) => {
-  //   return (
-  //     <button
-  //       onClick={() =>
-  //         modifyTodoContent(
-  //           todoId,
-  //           contentItem.value,
-  //           color,
-  //           contentItem.orderNum
-  //         )
-  //       }
-  //       className='selectedTodo__btn'>
-  //       {color}
-  //     </button>
-  //   )
-  // }
-
   let titlesEntriesArr = Object.entries(todoTitles)
+
+  let titleItem = {
+    color: '',
+    bold: false,
+    italic: false,
+    underline: false,
+  }
+  if (todoId) {
+    titleItem = todoTitles[todoId]
+  }
+  // console.log(titleItem)
+
+  let titleStyles = {
+    fontWeight: titleItem.bold ? 'bold' : 'normal',
+    textDecoration: titleItem.underline ? 'underline' : 'none',
+    fontStyle: titleItem.italic ? 'italic' : 'normal',
+    color: titleItem.color,
+  }
 
   return (
     <div className='todoPage'>
       <div className='leftBar'>
         {titlesEntriesArr.map(entry => (
           <div key={`${entry[0]}_title`}>
-            <NavLink to={`/todo/${entry[0]}`} className='leftBar__item'>
-              {entry[1]}
+            <NavLink
+              onClick={() => selectContentItem(null)}
+              to={`/todo/${entry[0]}`}
+              className='leftBar__item'>
+              {entry[1].value}
             </NavLink>
             <button onClick={() => deleteTodoHandler(entry[0])}>del</button>
           </div>
@@ -77,8 +81,12 @@ const ToDoPageNew: React.FC<
 
       <div className='selectedTodo'>
         <input
-          onBlur={() => props.changeTodoTitle(todoId, localTodoTitle)}
+          style={{ ...titleStyles }}
+          onBlur={() =>
+            props.changeTodoTitle(todoId, { value: localTodoTitle })
+          }
           onKeyDown={(e: any) => e.key === 'Enter' && e.target.blur()}
+          onFocus={() => selectContentItem('title')}
           onChange={e => setLocalTodoTitle(e.target.value)}
           value={localTodoTitle}
           className='selectedTodo__H'
