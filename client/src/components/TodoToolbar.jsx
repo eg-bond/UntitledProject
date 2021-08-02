@@ -5,27 +5,23 @@ const TodoToolbar = ({
   todoTitles,
   modifyTodoContent,
   todoContent,
-  selectedTodo,
   selectedContentItem,
   changeTodoTitle,
 }) => {
-  let contentItem = {
-    order: 1,
-    value: '',
-    color: '',
-    selectionClr: '',
-    bold: false,
-    italic: false,
-    underline: false,
-  }
-
+  let contentItem
   if (selectedContentItem === 'title') {
     contentItem = todoTitles[todoId]
   } else if (selectedContentItem !== null) {
     contentItem = todoContent[todoId][selectedContentItem]
   }
 
-  const { color, bold, italic, underline } = contentItem
+  const {
+    color = 'black',
+    bold = false,
+    italic = false,
+    underline = false,
+  } = { ...contentItem }
+
   // console.log(contentItem)
 
   const modify = (todoId, propsToModify) => {

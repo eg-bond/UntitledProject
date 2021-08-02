@@ -2,7 +2,7 @@ import { combineReducers, compose, applyMiddleware, createStore } from 'redux'
 import { reducer as formReducer } from 'redux-form'
 import thunkMiddleware from 'redux-thunk'
 import authReduser, { AuthInitialStateType } from './authReduser'
-import todoReduser, { TodoInitialStateType } from './todoReduser'
+import todoReduser, { TodoInitialStateT } from './todoReduser'
 import { todoReduserNew } from './todoReduserNew'
 
 let rootReducer = combineReducers({

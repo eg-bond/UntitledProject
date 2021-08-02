@@ -2,27 +2,25 @@ import React, { useEffect, useState } from 'react'
 import { connect, useStore } from 'react-redux'
 import { compose } from 'redux'
 import { AppStateType } from '../../redux/store'
-import { actions, TodoInitialStateType } from '../../redux/todoReduser'
+import {
+  actions,
+  TodoInitialStateT,
+  TodoItemPropsT,
+} from '../../redux/todoReduser'
 import { useParams, useHistory, withRouter } from 'react-router-dom'
 import { todoAPI } from '../../api/api'
-import ToDoPageNew from './ToDoPageNew'
 import TodoToolbar from '../../components/TodoToolbar'
+import ToDoPage from './ToDoPage'
 
 const ToDoPageContainer: React.FC<
-  MapStateToPropsType & MapDispatchToPropsType & WithRouterPropsType
+  MapStateToPropsT & MapDispatchToPropsT & WithRouterPropsType
 > = ({
-  // todoListArr,
   todoTitles,
-  selectedTodo,
   todoContent,
   currentTodoId,
   selectedContentItem,
   addTodo,
   deleteTodo,
-  addTodoContentItem,
-  deleteTodoContentItem,
-  selectTodo,
-  selectContentItem,
   modifyTodoContent,
   ...props
 }) => {
@@ -48,18 +46,6 @@ const ToDoPageContainer: React.FC<
 
     deleteTodo(thisTodoId)
   }
-  type ContentItemType = {
-    value: string
-    importance: string
-    orderNum: number
-  }
-  type BodyType = {
-    idGenerator: number
-    todoListArr: Array<{ title: string; id: string }>
-    todoContentObj: {
-      [key: string]: Array<ContentItemType>
-    }
-  }
 
   useEffect(() => {
     if (idArr[0]) {
@@ -84,23 +70,20 @@ const ToDoPageContainer: React.FC<
         todoId={todoId}
         todoContent={todoContent}
         todoTitles={todoTitles}
-        selectedTodo={selectedTodo}
         selectedContentItem={selectedContentItem}
         modifyTodoContent={modifyTodoContent}
         changeTodoTitle={props.changeTodoTitle}
       />
-      <ToDoPageNew
-        // todoListArr={todoListArr}
+      <ToDoPage
         todoTitles={todoTitles}
         todoContent={todoContent}
-        selectedTodo={selectedTodo}
         currentTodoId={currentTodoId}
         addTodo={addTodo}
         deleteTodo={deleteTodo}
-        addTodoContentItem={addTodoContentItem}
-        deleteTodoContentItem={deleteTodoContentItem}
-        selectTodo={selectTodo}
-        selectContentItem={selectContentItem}
+        addTodoContentItem={props.addTodoContentItem}
+        deleteTodoContentItem={props.deleteTodoContentItem}
+        selectTodo={props.selectTodo}
+        selectContentItem={props.selectContentItem}
         modifyTodoContent={modifyTodoContent}
         changeTodoTitle={props.changeTodoTitle}
         deleteTodoHandler={deleteTodoHandler}
@@ -109,7 +92,7 @@ const ToDoPageContainer: React.FC<
   )
 }
 
-const mapStateToProps = (state: AppStateType): MapStateToPropsType => ({
+const mapStateToProps = (state: AppStateType): MapStateToPropsT => ({
   idGenerator: state.todo.idGenerator,
   todoTitles: state.todo.todoTitles,
   todoContent: state.todo.todoContent,
@@ -119,8 +102,8 @@ const mapStateToProps = (state: AppStateType): MapStateToPropsType => ({
 
 export default compose(
   connect<
-    MapStateToPropsType,
-    MapDispatchToPropsType,
+    MapStateToPropsT,
+    MapDispatchToPropsT,
     WithRouterPropsType,
     AppStateType
   >(mapStateToProps, {
@@ -135,32 +118,27 @@ export default compose(
   }),
   withRouter
 )(ToDoPageContainer)
-
+//?
 type WithRouterPropsType = {
   match: any
   history: Array<string>
 }
-export type MapStateToPropsType = {
+//done
+export type MapStateToPropsT = {
   idGenerator?: number
-  todoListArr: TodoInitialStateType['todoListArr']
-  todoContentObj?: TodoInitialStateType['todoContentObj']
-  selectedTodo: TodoInitialStateType['selectedTodo']
+  todoTitles: TodoInitialStateT['todoTitles']
+  todoContent?: TodoInitialStateT['todoContent']
+  currentTodoId: TodoInitialStateT['currentTodoId']
+  selectedContentItem: TodoInitialStateT['selectedContentItem']
 }
-export type MapDispatchToPropsType = {
+//done
+export type MapDispatchToPropsT = {
   addTodo: () => void
   deleteTodo: (todoId: string) => void
-  addTodoContentItem: (
-    todoId: string,
-    value: string,
-    importance: string
-  ) => void
-  deleteTodoContentItem: (todoId: string, orderNum: number) => void
+  addTodoContentItem: (todoId: string) => void
+  deleteTodoContentItem: (todoId: string, order: number) => void
   selectTodo: (todoId: string) => void
-  changeTodoTitle: (todoId: string, title: string) => void
-  modifyTodoContent: (
-    todoId: string,
-    value: string,
-    importance: string,
-    orderNum: number
-  ) => void
+  selectContentItem: (order: number | 'title' | null) => void
+  changeTodoTitle: (todoId: string, titleProps: TodoItemPropsT) => void
+  modifyTodoContent: (todoId: string, itemProps: TodoItemPropsT) => void
 }
