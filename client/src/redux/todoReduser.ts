@@ -9,47 +9,23 @@ import { AppStateType, InferActionsTypes } from './store'
 import { LoginFormDataType } from '../pages/login/AuthPage'
 import { authActions } from './authReduser'
 
-export type FormattingType = {
-  fontSize: string
-  bold: boolean
-  italic: boolean
-  underline: boolean
-  selectionColor: string
-}
-export type TodoItemPropsT = {
-  value?: string
+export type TodoTitlePropsT = {
+  value: string
   color?: string
   bold?: boolean
   italic?: boolean
   underline?: boolean
 }
-type TodoTitlesT = {
-  [key: string]: TodoItemPropsT
-}
-// type TodoTitlesT = {
-//   [key: string]: {
-//     value: string
-//     color?: string
-//     bold?: boolean
-//     italic?: boolean
-//     underline?: boolean
-//   }
-// }
-type TodoContentT = {
-  [key: string]: Array<{
-    order: number
-    value: string
-    color?: string
-    // selectionClr: string
-    bold?: boolean
-    italic?: boolean
-    underline?: boolean
-  }>
-}
+export type TodoItemPropsT = TodoTitlePropsT & { order: number }
+
 export type TodoInitialStateT = {
   idGenerator: number
-  todoTitles: TodoTitlesT
-  todoContent: TodoContentT
+  todoTitles: {
+    [key: string]: TodoTitlePropsT
+  }
+  todoContent: {
+    [key: string]: Array<TodoItemPropsT>
+  }
   currentTodoId: string | null
   selectedContentItem: number | 'title' | null
 }
@@ -63,7 +39,6 @@ let initialState: TodoInitialStateT = {
       italic: false,
       underline: false,
     },
-    // eg_bond_todo1: 'title1',
   },
   todoContent: {
     eg_bond_todo1: [
@@ -71,7 +46,6 @@ let initialState: TodoInitialStateT = {
         order: 0,
         value: 'bye bread',
         color: 'green',
-        // selectionClr: 'transparent',
         bold: false,
         italic: false,
         underline: false,
@@ -80,7 +54,6 @@ let initialState: TodoInitialStateT = {
         order: 1,
         value: 'bye milk',
         color: 'red',
-        // selectionClr: 'transparent',
         bold: true,
         italic: false,
         underline: false,
@@ -91,11 +64,9 @@ let initialState: TodoInitialStateT = {
   selectedContentItem: null,
 }
 
-// export type TodoInitialStateType = typeof initialState
-
 export const todoReduser = (
   state = initialState,
-  action: ActionsTypes
+  action: InferredTodoActionsT
 ): TodoInitialStateT => {
   switch (action.type) {
     case 'todo/SET_INITIAL_TODO_DATA':
@@ -155,10 +126,11 @@ export const todoReduser = (
       let redusedTodo = [...state.todoContent[action.todoId]]
       redusedTodo.splice(action.order, 1)
 
-      for (let i = 0; i <= redusedTodo.length - 1; i++) {
-        //упорядочиваем order
-        redusedTodo[i].order = i
-      }
+      //упорядочиваем order
+      redusedTodo.forEach((item, i) => {
+        item.order = i
+      })
+
       return {
         ...state,
         todoContent: {
@@ -204,17 +176,22 @@ export const todoReduser = (
       }
 
       return newState
-    //ToolbarActions-------------------------
-    // case 'todo/CHANGE_COLOR'
 
     default:
       return state
   }
 }
+export type TodoActionsT = typeof actions
+type InferredTodoActionsT = InferActionsTypes<typeof actions>
+type ThunkType = ThunkAction<void, AppStateType, unknown, InferredTodoActionsT>
 
-type ActionsTypes = InferActionsTypes<typeof actions>
-type ThunkType = ThunkAction<void, AppStateType, unknown, ActionsTypes>
-
+export type ItemPropsToDispatch = {
+  value?: string
+  color?: string
+  bold?: boolean
+  italic?: boolean
+  underline?: boolean
+}
 export const actions = {
   addTodo: () => ({ type: 'todo/ADD_TODO' } as const),
   deleteTodo: (todoId: string) =>
@@ -232,16 +209,7 @@ export const actions = {
     ({ type: 'todo/SELECT_CONTENT_ITEM', order } as const),
   changeTodoTitle: (todoId: string, titleProps: Object) =>
     ({ type: 'todo/CHANGE_TODO_TITLE', todoId, titleProps } as const),
-  modifyTodoContent: (
-    todoId: string,
-    itemProps: {
-      value?: string
-      color?: string
-      bold?: boolean
-      italic?: boolean
-      underline?: boolean
-    }
-  ) =>
+  modifyTodoContent: (todoId: string, itemProps: ItemPropsToDispatch) =>
     ({
       type: 'todo/MODIFY_TODO_CONTENT',
       todoId,
@@ -249,8 +217,6 @@ export const actions = {
     } as const),
   setInitialTodoData: (todoData: TodoAPIInitialStateType) =>
     ({ type: 'todo/SET_INITIAL_TODO_DATA', todoData } as const),
-  clearFormatting: (todoId: string) =>
-    ({ type: 'todo/CLEAR_FORMATTING', todoId } as const),
 }
 
 export const getTodo = (): ThunkType => {

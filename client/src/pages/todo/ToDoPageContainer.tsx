@@ -1,9 +1,10 @@
-import React, { useEffect, useState } from 'react'
+import React, { useEffect } from 'react'
 import { connect, useStore } from 'react-redux'
 import { compose } from 'redux'
 import { AppStateType } from '../../redux/store'
 import {
   actions,
+  TodoActionsT,
   TodoInitialStateT,
   TodoItemPropsT,
 } from '../../redux/todoReduser'
@@ -93,7 +94,6 @@ const ToDoPageContainer: React.FC<
 }
 
 const mapStateToProps = (state: AppStateType): MapStateToPropsT => ({
-  idGenerator: state.todo.idGenerator,
   todoTitles: state.todo.todoTitles,
   todoContent: state.todo.todoContent,
   currentTodoId: state.todo.currentTodoId,
@@ -118,27 +118,26 @@ export default compose(
   }),
   withRouter
 )(ToDoPageContainer)
-//?
+
 type WithRouterPropsType = {
   match: any
   history: Array<string>
 }
-//done
 export type MapStateToPropsT = {
-  idGenerator?: number
   todoTitles: TodoInitialStateT['todoTitles']
-  todoContent?: TodoInitialStateT['todoContent']
+  todoContent: TodoInitialStateT['todoContent']
   currentTodoId: TodoInitialStateT['currentTodoId']
-  selectedContentItem: TodoInitialStateT['selectedContentItem']
+  selectedContentItem?: TodoInitialStateT['selectedContentItem']
 }
-//done
 export type MapDispatchToPropsT = {
-  addTodo: () => void
-  deleteTodo: (todoId: string) => void
-  addTodoContentItem: (todoId: string) => void
-  deleteTodoContentItem: (todoId: string, order: number) => void
-  selectTodo: (todoId: string) => void
-  selectContentItem: (order: number | 'title' | null) => void
-  changeTodoTitle: (todoId: string, titleProps: TodoItemPropsT) => void
-  modifyTodoContent: (todoId: string, itemProps: TodoItemPropsT) => void
+  addTodo: typeof actions.addTodo
+  // addTodo: TodoActionsT['addTodo']
+  deleteTodo: TodoActionsT['deleteTodo']
+  addTodoContentItem: TodoActionsT['addTodoContentItem']
+  deleteTodoContentItem: TodoActionsT['deleteTodoContentItem']
+  selectTodo: TodoActionsT['selectTodo']
+  selectContentItem: typeof actions.selectContentItem
+  // selectContentItem: TodoActionsT['selectContentItem']
+  changeTodoTitle: TodoActionsT['changeTodoTitle']
+  modifyTodoContent: TodoActionsT['modifyTodoContent']
 }

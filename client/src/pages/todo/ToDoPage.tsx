@@ -1,6 +1,6 @@
 import React, { useEffect, useState } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
-import { TodoInput } from './TodoInput'
+import { TodoContentItem } from './TodoContentItem'
 import { MapDispatchToPropsT, MapStateToPropsT } from './ToDoPageContainer'
 
 export type DeleteTodoHandlerType = {
@@ -38,23 +38,13 @@ const ToDoPage: React.FC<
   }, [currentTodoId])
 
   let titlesEntriesArr = Object.entries(todoTitles)
-
-  let titleItem = {
-    value: '',
-    color: '',
-    bold: false,
-    italic: false,
-    underline: false,
-  }
-  if (todoId) {
-    titleItem = todoTitles[todoId]
-  }
+  let { bold, underline, italic, color } = { ...todoTitles[todoId] }
 
   let titleStyles = {
-    fontWeight: titleItem.bold ? 700 : 400,
-    textDecoration: titleItem.underline ? 'underline' : 'none',
-    fontStyle: titleItem.italic ? 'italic' : 'normal',
-    color: titleItem.color,
+    fontWeight: bold ? 700 : 400,
+    textDecoration: underline ? 'underline' : 'none',
+    fontStyle: italic ? 'italic' : 'normal',
+    color: color,
   }
 
   return (
@@ -95,10 +85,7 @@ const ToDoPage: React.FC<
               <div
                 key={`${todoId}_${contentItem.order}`}
                 className='selectedTodo__item'>
-                <TodoInput
-                  value={contentItem.value}
-                  color={contentItem.color}
-                  order={contentItem.order}
+                <TodoContentItem
                   todoId={todoId}
                   modifyTodoContent={modifyTodoContent}
                   selectContentItem={selectContentItem}
