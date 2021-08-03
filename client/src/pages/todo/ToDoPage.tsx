@@ -1,15 +1,15 @@
 import React, { useEffect, useState } from 'react'
 import { NavLink, useParams } from 'react-router-dom'
 import { TodoContentItem } from './TodoContentItem'
-import { MapDispatchToPropsT, MapStateToPropsT } from './ToDoPageContainer'
+import { TodoReduxPropsT } from './ToDoPageContainer'
 
-export type DeleteTodoHandlerType = {
+interface ToDoPagePropsT extends Omit<TodoReduxPropsT, 'selectedContentItem'> {
+  todoId: string
   deleteTodoHandler: (thisTodoId: string) => void
 }
 
-const ToDoPage: React.FC<
-  MapStateToPropsT & MapDispatchToPropsT & DeleteTodoHandlerType
-> = ({
+const ToDoPage: React.FC<ToDoPagePropsT> = ({
+  todoId,
   todoTitles,
   currentTodoId,
   todoContent,
@@ -22,18 +22,13 @@ const ToDoPage: React.FC<
   deleteTodoHandler,
   ...props
 }) => {
-  // @ts-ignore
-  let { todoId } = useParams()
-
   const [localTodoTitle, setLocalTodoTitle] = useState('')
 
   useEffect(() => {
-    selectTodo(todoId)
-  }, [todoId])
-
-  useEffect(() => {
     if (currentTodoId) {
-      setLocalTodoTitle(todoTitles[currentTodoId].value)
+      console.log(todoTitles[currentTodoId])
+      let { value } = { ...todoTitles[currentTodoId] }
+      setLocalTodoTitle(value)
     }
   }, [currentTodoId])
 
@@ -70,9 +65,7 @@ const ToDoPage: React.FC<
       <div className='selectedTodo'>
         <input
           style={{ ...titleStyles }}
-          onBlur={() =>
-            props.changeTodoTitle(todoId, { value: localTodoTitle })
-          }
+          onBlur={() => props.changeTodoTitle({ value: localTodoTitle })}
           onKeyDown={(e: any) => e.key === 'Enter' && e.target.blur()}
           onFocus={() => selectContentItem('title')}
           onChange={e => setLocalTodoTitle(e.target.value)}
@@ -86,23 +79,18 @@ const ToDoPage: React.FC<
                 key={`${todoId}_${contentItem.order}`}
                 className='selectedTodo__item'>
                 <TodoContentItem
-                  todoId={todoId}
                   modifyTodoContent={modifyTodoContent}
                   selectContentItem={selectContentItem}
                   itemProps={{ ...contentItem }}
                 />
                 <button
-                  onClick={() =>
-                    deleteTodoContentItem(todoId, contentItem.order)
-                  }
+                  onClick={() => deleteTodoContentItem(contentItem.order)}
                   className='selectedTodo__btn'>
                   del
                 </button>
               </div>
             ))}
-            <button onClick={() => addTodoContentItem(todoId)}>
-              Add todo item
-            </button>
+            <button onClick={() => addTodoContentItem()}>Add todo item</button>
           </div>
         )}
       </div>

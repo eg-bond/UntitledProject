@@ -9,14 +9,15 @@ import { AppStateType, InferActionsTypes } from './store'
 import { LoginFormDataType } from '../pages/login/AuthPage'
 import { authActions } from './authReduser'
 
-export type TodoTitlePropsT = {
+export type TodoItemPropsT = {
   value: string
+  order: number
   color?: string
   bold?: boolean
   italic?: boolean
   underline?: boolean
 }
-export type TodoItemPropsT = TodoTitlePropsT & { order: number }
+export type TodoTitlePropsT = Omit<TodoItemPropsT, 'order'>
 
 export type TodoInitialStateT = {
   idGenerator: number
@@ -26,7 +27,7 @@ export type TodoInitialStateT = {
   todoContent: {
     [key: string]: Array<TodoItemPropsT>
   }
-  currentTodoId: string | null
+  currentTodoId: string | null | undefined
   selectedContentItem: number | 'title' | null
 }
 let initialState: TodoInitialStateT = {
@@ -91,6 +92,7 @@ export const todoReduser = (
           [`eg_bond_todo${state.idGenerator}`]: [],
         },
       }
+    //todoId need to be here
     case 'todo/DELETE_TODO':
       let newS = {
         ...state,
@@ -108,10 +110,10 @@ export const todoReduser = (
 
     case 'todo/ADD_TODO_CONTENT_ITEM':
       let newContent = [
-        ...state.todoContent[action.todoId],
+        ...state.todoContent[String(state.currentTodoId)],
         {
           value: '',
-          order: state.todoContent[action.todoId].length,
+          order: state.todoContent[String(state.currentTodoId)].length,
         },
       ]
 
@@ -119,11 +121,11 @@ export const todoReduser = (
         ...state,
         todoContent: {
           ...state.todoContent,
-          [action.todoId]: newContent,
+          [String(state.currentTodoId)]: newContent,
         },
       }
     case 'todo/DELETE_TODO_CONTENT_ITEM':
-      let redusedTodo = [...state.todoContent[action.todoId]]
+      let redusedTodo = [...state.todoContent[String(state.currentTodoId)]]
       redusedTodo.splice(action.order, 1)
 
       //упорядочиваем order
@@ -135,7 +137,7 @@ export const todoReduser = (
         ...state,
         todoContent: {
           ...state.todoContent,
-          [action.todoId]: redusedTodo,
+          [String(state.currentTodoId)]: redusedTodo,
         },
       }
     case 'todo/SELECT_TODO':
@@ -148,13 +150,16 @@ export const todoReduser = (
         ...state,
         selectedContentItem: action.order,
       }
+
+    //Переименовать!!
+    //todoId removed
     case 'todo/CHANGE_TODO_TITLE':
       return {
         ...state,
         todoTitles: {
           ...state.todoTitles,
-          [action.todoId]: {
-            ...state.todoTitles[action.todoId],
+          [String(state.currentTodoId)]: {
+            ...state.todoTitles[String(state.currentTodoId)],
             ...action.titleProps,
           },
         },
@@ -167,10 +172,12 @@ export const todoReduser = (
         },
       }
       if (state.selectedContentItem !== null) {
-        //@ts-ignore
-        newState.todoContent[action.todoId][state.selectedContentItem] = {
-          //@ts-ignore
-          ...state.todoContent[action.todoId][state.selectedContentItem],
+        newState.todoContent[String(state.currentTodoId)][
+          Number(state.selectedContentItem)
+        ] = {
+          ...state.todoContent[String(state.currentTodoId)][
+            Number(state.selectedContentItem)
+          ],
           ...action.itemProps,
         }
       }
@@ -181,38 +188,29 @@ export const todoReduser = (
       return state
   }
 }
-export type TodoActionsT = typeof actions
+
 type InferredTodoActionsT = InferActionsTypes<typeof actions>
 type ThunkType = ThunkAction<void, AppStateType, unknown, InferredTodoActionsT>
 
-export type ItemPropsToDispatch = {
-  value?: string
-  color?: string
-  bold?: boolean
-  italic?: boolean
-  underline?: boolean
-}
 export const actions = {
   addTodo: () => ({ type: 'todo/ADD_TODO' } as const),
   deleteTodo: (todoId: string) =>
     ({ type: 'todo/DELETE_TODO', todoId } as const),
-  addTodoContentItem: (todoId: string) =>
+  addTodoContentItem: () =>
     ({
       type: 'todo/ADD_TODO_CONTENT_ITEM',
-      todoId,
     } as const),
-  deleteTodoContentItem: (todoId: string, order: number) =>
-    ({ type: 'todo/DELETE_TODO_CONTENT_ITEM', todoId, order } as const),
-  selectTodo: (todoId: string) =>
+  deleteTodoContentItem: (order: number) =>
+    ({ type: 'todo/DELETE_TODO_CONTENT_ITEM', order } as const),
+  selectTodo: (todoId: string | null) =>
     ({ type: 'todo/SELECT_TODO', todoId } as const),
   selectContentItem: (order: number | 'title' | null) =>
     ({ type: 'todo/SELECT_CONTENT_ITEM', order } as const),
-  changeTodoTitle: (todoId: string, titleProps: Object) =>
-    ({ type: 'todo/CHANGE_TODO_TITLE', todoId, titleProps } as const),
-  modifyTodoContent: (todoId: string, itemProps: ItemPropsToDispatch) =>
+  changeTodoTitle: (titleProps: Object) =>
+    ({ type: 'todo/CHANGE_TODO_TITLE', titleProps } as const),
+  modifyTodoContent: (itemProps: Partial<TodoItemPropsT>) =>
     ({
       type: 'todo/MODIFY_TODO_CONTENT',
-      todoId,
       itemProps,
     } as const),
   setInitialTodoData: (todoData: TodoAPIInitialStateType) =>

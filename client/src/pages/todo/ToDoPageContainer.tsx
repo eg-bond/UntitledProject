@@ -1,33 +1,26 @@
 import React, { useEffect } from 'react'
-import { connect, useStore } from 'react-redux'
-import { compose } from 'redux'
+import { connect, ConnectedProps, useStore } from 'react-redux'
 import { AppStateType } from '../../redux/store'
-import {
-  actions,
-  TodoActionsT,
-  TodoInitialStateT,
-  TodoItemPropsT,
-} from '../../redux/todoReduser'
-import { useParams, useHistory, withRouter } from 'react-router-dom'
+import { actions } from '../../redux/todoReduser'
+import { useParams, useHistory } from 'react-router-dom'
 import { todoAPI } from '../../api/api'
-import TodoToolbar from '../../components/TodoToolbar'
 import ToDoPage from './ToDoPage'
+import TodoToolbar from '../../components/TodoToolbar'
 
-const ToDoPageContainer: React.FC<
-  MapStateToPropsT & MapDispatchToPropsT & WithRouterPropsType
-> = ({
+const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
   todoTitles,
   todoContent,
   currentTodoId,
   selectedContentItem,
   addTodo,
   deleteTodo,
+  selectTodo,
+  selectContentItem,
   modifyTodoContent,
   ...props
 }) => {
   let history = useHistory()
-  // @ts-ignore
-  let { todoId } = useParams()
+  let { todoId } = useParams<{ todoId: string }>()
   let currentStore = useStore()
   let idArr = Object.keys(todoTitles)
 
@@ -39,30 +32,40 @@ const ToDoPageContainer: React.FC<
         index === 0
           ? history.push(`/todo/${idArr[index + 1]}`)
           : history.push(`/todo/${idArr[index - 1]}`)
-
       let emptyTodoUrl = () => history.push(`/todo`)
 
-      idArr.length > 1 ? nextTodoUrl() : emptyTodoUrl()
+      const noTodosHandler = () => {
+        selectTodo(null)
+        selectContentItem(null)
+        emptyTodoUrl()
+      }
+
+      idArr.length > 1 ? nextTodoUrl() : noTodosHandler()
     }
 
     deleteTodo(thisTodoId)
   }
+
+  // state.currentTodoId = todoId
+  useEffect(() => {
+    selectTodo(todoId)
+  }, [todoId])
 
   useEffect(() => {
     if (idArr[0]) {
       history.push(`/todo/${idArr[0]}`)
     }
 
-    return () => {
-      let currentTodoState = currentStore.getState().todo
+    // return () => {
+    //   let currentTodoState = currentStore.getState().todo
 
-      let body = {
-        idGenerator: currentTodoState.idGenerator,
-        todoListArr: currentTodoState.todoListArr,
-        todoContentObj: currentTodoState.todoContentObj,
-      }
-      todoAPI.syncTodo(body)
-    }
+    //   let body = {
+    //     idGenerator: currentTodoState.idGenerator,
+    //     todoListArr: currentTodoState.todoListArr,
+    //     todoContentObj: currentTodoState.todoContentObj,
+    //   }
+    //   todoAPI.syncTodo(body)
+    // }
   }, [])
 
   return (
@@ -76,6 +79,7 @@ const ToDoPageContainer: React.FC<
         changeTodoTitle={props.changeTodoTitle}
       />
       <ToDoPage
+        todoId={todoId}
         todoTitles={todoTitles}
         todoContent={todoContent}
         currentTodoId={currentTodoId}
@@ -83,8 +87,8 @@ const ToDoPageContainer: React.FC<
         deleteTodo={deleteTodo}
         addTodoContentItem={props.addTodoContentItem}
         deleteTodoContentItem={props.deleteTodoContentItem}
-        selectTodo={props.selectTodo}
-        selectContentItem={props.selectContentItem}
+        selectTodo={selectTodo}
+        selectContentItem={selectContentItem}
         modifyTodoContent={modifyTodoContent}
         changeTodoTitle={props.changeTodoTitle}
         deleteTodoHandler={deleteTodoHandler}
@@ -93,51 +97,25 @@ const ToDoPageContainer: React.FC<
   )
 }
 
-const mapStateToProps = (state: AppStateType): MapStateToPropsT => ({
+const mapStateToProps = (state: AppStateType) => ({
   todoTitles: state.todo.todoTitles,
   todoContent: state.todo.todoContent,
   currentTodoId: state.todo.currentTodoId,
   selectedContentItem: state.todo.selectedContentItem,
 })
 
-export default compose(
-  connect<
-    MapStateToPropsT,
-    MapDispatchToPropsT,
-    WithRouterPropsType,
-    AppStateType
-  >(mapStateToProps, {
-    addTodo: actions.addTodo,
-    deleteTodo: actions.deleteTodo,
-    addTodoContentItem: actions.addTodoContentItem,
-    deleteTodoContentItem: actions.deleteTodoContentItem,
-    selectTodo: actions.selectTodo,
-    selectContentItem: actions.selectContentItem,
-    changeTodoTitle: actions.changeTodoTitle,
-    modifyTodoContent: actions.modifyTodoContent,
-  }),
-  withRouter
-)(ToDoPageContainer)
+const mapDispatchToProps = {
+  addTodo: actions.addTodo,
+  deleteTodo: actions.deleteTodo,
+  addTodoContentItem: actions.addTodoContentItem,
+  deleteTodoContentItem: actions.deleteTodoContentItem,
+  selectTodo: actions.selectTodo,
+  selectContentItem: actions.selectContentItem,
+  changeTodoTitle: actions.changeTodoTitle,
+  modifyTodoContent: actions.modifyTodoContent,
+}
 
-type WithRouterPropsType = {
-  match: any
-  history: Array<string>
-}
-export type MapStateToPropsT = {
-  todoTitles: TodoInitialStateT['todoTitles']
-  todoContent: TodoInitialStateT['todoContent']
-  currentTodoId: TodoInitialStateT['currentTodoId']
-  selectedContentItem?: TodoInitialStateT['selectedContentItem']
-}
-export type MapDispatchToPropsT = {
-  addTodo: typeof actions.addTodo
-  // addTodo: TodoActionsT['addTodo']
-  deleteTodo: TodoActionsT['deleteTodo']
-  addTodoContentItem: TodoActionsT['addTodoContentItem']
-  deleteTodoContentItem: TodoActionsT['deleteTodoContentItem']
-  selectTodo: TodoActionsT['selectTodo']
-  selectContentItem: typeof actions.selectContentItem
-  // selectContentItem: TodoActionsT['selectContentItem']
-  changeTodoTitle: TodoActionsT['changeTodoTitle']
-  modifyTodoContent: TodoActionsT['modifyTodoContent']
-}
+const connector = connect(mapStateToProps, mapDispatchToProps)
+export type TodoReduxPropsT = ConnectedProps<typeof connector>
+
+export default connector(ToDoPageContainer)

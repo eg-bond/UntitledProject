@@ -1,18 +1,17 @@
 import React, { useState } from 'react'
-import { TodoActionsT, TodoItemPropsT } from '../../redux/todoReduser'
+import { TodoItemPropsT } from '../../redux/todoReduser'
+import { TodoReduxPropsT } from './ToDoPageContainer'
 
-type ContentItemT = {
-  todoId: string
-  modifyTodoContent: TodoActionsT['modifyTodoContent']
-  selectContentItem: TodoActionsT['selectContentItem']
+type ContentItemPropsT = {
+  modifyTodoContent: TodoReduxPropsT['modifyTodoContent']
+  selectContentItem: TodoReduxPropsT['selectContentItem']
   itemProps: TodoItemPropsT
 }
 
-export const TodoContentItem: React.FC<ContentItemT> = ({
-  itemProps,
+export const TodoContentItem: React.FC<ContentItemPropsT> = ({
   selectContentItem,
   modifyTodoContent,
-  todoId,
+  itemProps,
 }) => {
   const { value, order, color, bold, italic, underline } = itemProps
 
@@ -26,7 +25,7 @@ export const TodoContentItem: React.FC<ContentItemT> = ({
   }
 
   const blurHandler = () => {
-    modifyTodoContent(todoId, {
+    modifyTodoContent({
       value: localValue,
     })
     switchFocus(false)
