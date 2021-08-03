@@ -26,7 +26,6 @@ const ToDoPage: React.FC<ToDoPagePropsT> = ({
 
   useEffect(() => {
     if (currentTodoId) {
-      console.log(todoTitles[currentTodoId])
       let { value } = { ...todoTitles[currentTodoId] }
       setLocalTodoTitle(value)
     }
