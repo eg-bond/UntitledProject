@@ -1,13 +1,14 @@
 import React, { useEffect } from 'react'
 import { connect, ConnectedProps, useStore } from 'react-redux'
 import { AppStateType } from '../../redux/store'
-import { actions } from '../../redux/todoReduser'
+import { actions, TodoInitialStateT } from '../../redux/todoReduser'
 import { useParams, useHistory } from 'react-router-dom'
 import { todoAPI } from '../../api/api'
 import ToDoPage from './ToDoPage'
 import TodoToolbar from '../../components/TodoToolbar'
 
 const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
+  idGenerator,
   todoTitles,
   todoContent,
   currentTodoId,
@@ -21,9 +22,10 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
 }) => {
   let history = useHistory()
   let { todoId } = useParams<{ todoId: string }>()
-  let currentStore = useStore()
+  let currentTodoState: TodoInitialStateT = useStore().getState().todo
   let idArr = Object.keys(todoTitles)
 
+  console.log(todoTitles)
   const deleteTodoHandler = (thisTodoId: string) => {
     if (todoId === thisTodoId) {
       let index = idArr.findIndex(item => item === thisTodoId)
@@ -46,27 +48,53 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
     deleteTodo(thisTodoId)
   }
 
+  const objectsIsNotEqual = (obj1: any, obj2: any) => {
+    let keys = Object.keys(obj1)
+    return keys.some(
+      key => JSON.stringify(obj1[key]) !== JSON.stringify(obj2[key])
+    )
+  }
+  let currentStore = {
+    idGenerator: currentTodoState.idGenerator,
+    todoContent: currentTodoState.todoContent,
+    todoTitles: currentTodoState.todoTitles,
+  }
+
+  useEffect(() => {
+    // if (idArr[0]) {
+    //   history.push(`/todo/${idArr[0]}`)
+    // }
+    // Загружаем данные из LocalStorage в стейт после вмонтирования компоненты
+    if (objectsIsNotEqual(currentStore, JSON.parse(localStorage.todoData))) {
+      props.setInitialTodoData(JSON.parse(localStorage.todoData))
+    }
+    return () => {
+      // let currentTodoState = currentStore.getState().todo
+      // let body = {
+      //   idGenerator: currentTodoState.idGenerator,
+      //   todoListArr: currentTodoState.todoListArr,
+      //   todoContentObj: currentTodoState.todoContentObj,
+      // }
+      // todoAPI.syncTodo(body)
+      selectTodo(null)
+      selectContentItem(null)
+    }
+  }, [])
+
+  //state changed and need to be placed in LS
+  useEffect(() => {
+    let todoState = {
+      idGenerator,
+      todoTitles,
+      todoContent,
+    }
+    localStorage.todoData = JSON.stringify(todoState)
+  }, [todoTitles, todoContent])
+
   // state.currentTodoId = todoId
   useEffect(() => {
     selectTodo(todoId)
   }, [todoId])
-
-  useEffect(() => {
-    if (idArr[0]) {
-      history.push(`/todo/${idArr[0]}`)
-    }
-
-    // return () => {
-    //   let currentTodoState = currentStore.getState().todo
-
-    //   let body = {
-    //     idGenerator: currentTodoState.idGenerator,
-    //     todoListArr: currentTodoState.todoListArr,
-    //     todoContentObj: currentTodoState.todoContentObj,
-    //   }
-    //   todoAPI.syncTodo(body)
-    // }
-  }, [])
 
   return (
     <>
@@ -98,6 +126,7 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
 }
 
 const mapStateToProps = (state: AppStateType) => ({
+  idGenerator: state.todo.idGenerator,
   todoTitles: state.todo.todoTitles,
   todoContent: state.todo.todoContent,
   currentTodoId: state.todo.currentTodoId,
@@ -105,6 +134,7 @@ const mapStateToProps = (state: AppStateType) => ({
 })
 
 const mapDispatchToProps = {
+  setInitialTodoData: actions.setInitialTodoData,
   addTodo: actions.addTodo,
   deleteTodo: actions.deleteTodo,
   addTodoContentItem: actions.addTodoContentItem,

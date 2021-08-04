@@ -30,41 +30,47 @@ export type TodoInitialStateT = {
   currentTodoId: string | null | undefined
   selectedContentItem: number | 'title' | null
 }
+// let initialState: TodoInitialStateT = {
+//   idGenerator: 2,
+//   todoTitles: {
+//     eg_bond_todo1: {
+//       value: 'title1',
+//       color: 'black',
+//       bold: true,
+//       italic: false,
+//       underline: false,
+//     },
+//   },
+//   todoContent: {
+//     eg_bond_todo1: [
+//       {
+//         order: 0,
+//         value: 'bye bread',
+//         color: 'green',
+//         bold: false,
+//         italic: false,
+//         underline: false,
+//       },
+//       {
+//         order: 1,
+//         value: 'bye milk',
+//         color: 'red',
+//         bold: true,
+//         italic: false,
+//         underline: false,
+//       },
+//     ],
+//   },
+//   currentTodoId: null,
+//   selectedContentItem: null,
+// }
 let initialState: TodoInitialStateT = {
-  idGenerator: 2,
-  todoTitles: {
-    eg_bond_todo1: {
-      value: 'title1',
-      color: 'black',
-      bold: true,
-      italic: false,
-      underline: false,
-    },
-  },
-  todoContent: {
-    eg_bond_todo1: [
-      {
-        order: 0,
-        value: 'bye bread',
-        color: 'green',
-        bold: false,
-        italic: false,
-        underline: false,
-      },
-      {
-        order: 1,
-        value: 'bye milk',
-        color: 'red',
-        bold: true,
-        italic: false,
-        underline: false,
-      },
-    ],
-  },
+  idGenerator: 0,
+  todoTitles: {},
+  todoContent: {},
   currentTodoId: null,
   selectedContentItem: null,
 }
-
 export const todoReduser = (
   state = initialState,
   action: InferredTodoActionsT
@@ -92,7 +98,6 @@ export const todoReduser = (
           [`eg_bond_todo${state.idGenerator}`]: [],
         },
       }
-    //todoId need to be here
     case 'todo/DELETE_TODO':
       let newS = {
         ...state,
@@ -127,7 +132,6 @@ export const todoReduser = (
     case 'todo/DELETE_TODO_CONTENT_ITEM':
       let redusedTodo = [...state.todoContent[String(state.currentTodoId)]]
       redusedTodo.splice(action.order, 1)
-
       //упорядочиваем order
       redusedTodo.forEach((item, i) => {
         item.order = i
@@ -152,7 +156,6 @@ export const todoReduser = (
       }
 
     //Переименовать!!
-    //todoId removed
     case 'todo/CHANGE_TODO_TITLE':
       return {
         ...state,
@@ -213,20 +216,22 @@ export const actions = {
       type: 'todo/MODIFY_TODO_CONTENT',
       itemProps,
     } as const),
-  setInitialTodoData: (todoData: TodoAPIInitialStateType) =>
-    ({ type: 'todo/SET_INITIAL_TODO_DATA', todoData } as const),
+  setInitialTodoData: (
+    todoData: Omit<
+      TodoInitialStateT,
+      'currentTodoId' | 'selectedTodoContentItem'
+    >
+  ) => ({ type: 'todo/SET_INITIAL_TODO_DATA', todoData } as const),
 }
 
 export const getTodo = (): ThunkType => {
   return async dispatch => {
     //@ts-ignore
     // dispatch(authActions.fetchInProgress(true)) // из authReduser
-
-    let responseData = await todoAPI.getTodo()
-
-    if (responseData.statusCode === 0) {
-      dispatch(actions.setInitialTodoData(responseData.todoData))
-    }
+    // let responseData = await todoAPI.getTodo()
+    // if (responseData.statusCode === 0) {
+    //   dispatch(actions.setInitialTodoData(responseData.todoData))
+    // }
     //@ts-ignore
     // dispatch(authActions.fetchInProgress(false))
   }

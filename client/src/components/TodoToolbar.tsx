@@ -19,6 +19,10 @@ const TodoToolbar: React.FC<ContentItemPropsT> = ({
   modifyTodoContent,
   changeTodoTitle,
 }) => {
+  if (!todoId) {
+    return null
+  }
+
   let contentItem
   if (selectedContentItem === 'title') {
     contentItem = todoTitles[todoId]

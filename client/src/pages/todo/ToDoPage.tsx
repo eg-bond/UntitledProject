@@ -3,7 +3,11 @@ import { NavLink, useParams } from 'react-router-dom'
 import { TodoContentItem } from './TodoContentItem'
 import { TodoReduxPropsT } from './ToDoPageContainer'
 
-interface ToDoPagePropsT extends Omit<TodoReduxPropsT, 'selectedContentItem'> {
+interface ToDoPagePropsT
+  extends Omit<
+    TodoReduxPropsT,
+    'selectedContentItem' | 'idGenerator' | 'setInitialTodoData'
+  > {
   todoId: string
   deleteTodoHandler: (thisTodoId: string) => void
 }
@@ -62,15 +66,17 @@ const ToDoPage: React.FC<ToDoPagePropsT> = ({
       </div>
 
       <div className='selectedTodo'>
-        <input
-          style={{ ...titleStyles }}
-          onBlur={() => props.changeTodoTitle({ value: localTodoTitle })}
-          onKeyDown={(e: any) => e.key === 'Enter' && e.target.blur()}
-          onFocus={() => selectContentItem('title')}
-          onChange={e => setLocalTodoTitle(e.target.value)}
-          value={localTodoTitle}
-          className='selectedTodo__H'
-        />
+        {todoId && (
+          <input
+            style={{ ...titleStyles }}
+            onBlur={() => props.changeTodoTitle({ value: localTodoTitle })}
+            onKeyDown={(e: any) => e.key === 'Enter' && e.target.blur()}
+            onFocus={() => selectContentItem('title')}
+            onChange={e => setLocalTodoTitle(e.target.value)}
+            value={localTodoTitle}
+            className='selectedTodo__H'
+          />
+        )}
         {todoId && (
           <div className='selectedTodo__items'>
             {todoContent[todoId].map(contentItem => (
