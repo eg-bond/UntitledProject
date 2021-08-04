@@ -1,4 +1,4 @@
-import React, { useEffect } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect, ConnectedProps, useStore } from 'react-redux'
 import { AppStateType } from '../../redux/store'
 import { actions, TodoInitialStateT } from '../../redux/todoReduser'
@@ -25,7 +25,6 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
   let currentTodoState: TodoInitialStateT = useStore().getState().todo
   let idArr = Object.keys(todoTitles)
 
-  console.log(todoTitles)
   const deleteTodoHandler = (thisTodoId: string) => {
     if (todoId === thisTodoId) {
       let index = idArr.findIndex(item => item === thisTodoId)
@@ -60,14 +59,33 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
     todoTitles: currentTodoState.todoTitles,
   }
 
+  const [synchronizedWithLS, syncWithLS] = useState(false)
+
+  const getTodosFromServer = async () => {
+    let { todoData } = await todoAPI.getTodo()
+
+    if (!localStorage.todoData) {
+      localStorage.todoData = JSON.stringify(todoData)
+    }
+
+    if (!!localStorage.todoData) {
+      if (objectsIsNotEqual(todoData, JSON.parse(localStorage.todoData))) {
+        localStorage.todoData = JSON.stringify(todoData)
+      }
+    }
+
+    props.setInitialTodoData(JSON.parse(localStorage.todoData))
+    syncWithLS(true)
+  }
+
   useEffect(() => {
+    // Загружаем данные из LocalStorage в стейт после вмонтирования компоненты
+    getTodosFromServer()
+
     // if (idArr[0]) {
     //   history.push(`/todo/${idArr[0]}`)
     // }
-    // Загружаем данные из LocalStorage в стейт после вмонтирования компоненты
-    if (objectsIsNotEqual(currentStore, JSON.parse(localStorage.todoData))) {
-      props.setInitialTodoData(JSON.parse(localStorage.todoData))
-    }
+
     return () => {
       // let currentTodoState = currentStore.getState().todo
       // let body = {
@@ -75,7 +93,7 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
       //   todoListArr: currentTodoState.todoListArr,
       //   todoContentObj: currentTodoState.todoContentObj,
       // }
-      // todoAPI.syncTodo(body)
+      todoAPI.syncTodo()
       selectTodo(null)
       selectContentItem(null)
     }
@@ -83,18 +101,26 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
 
   //state changed and need to be placed in LS
   useEffect(() => {
-    let todoState = {
-      idGenerator,
-      todoTitles,
-      todoContent,
+    if (synchronizedWithLS) {
+      localStorage.todoData = JSON.stringify({
+        idGenerator,
+        todoTitles,
+        todoContent,
+      })
+
+      todoAPI.syncTodo()
     }
-    localStorage.todoData = JSON.stringify(todoState)
   }, [todoTitles, todoContent])
 
   // state.currentTodoId = todoId
   useEffect(() => {
     selectTodo(todoId)
   }, [todoId])
+
+  // //Вынести в отдельную компоненту или HOC
+  // useEffect(() => {
+  //   todoAPI.syncTodo()
+  // }, [localStorage.todoData])
 
   return (
     <>

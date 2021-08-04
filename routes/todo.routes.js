@@ -10,7 +10,7 @@ router.post(
 
   async (req, res) => {
     try {
-      const { idGenerator, todoListArr, todoContentObj, token } = req.body
+      const { idGenerator, todoTitles, todoContent, token } = req.body
 
       const decoded = jwt.verify(token, config.get('jwtSecret'))
       const { userId } = decoded
@@ -19,12 +19,12 @@ router.post(
       const todo = await Todo.findOne({ owner: userId })
 
       if (todo) {
-        await todo.updateOne({ idGenerator, todoListArr, todoContentObj })
+        await todo.updateOne({ idGenerator, todoTitles, todoContent })
       } else {
         const todo = new Todo({
           idGenerator,
-          todoListArr,
-          todoContentObj,
+          todoTitles,
+          todoContent,
           owner: user.id,
         })
         await todo.save()
@@ -34,12 +34,10 @@ router.post(
         .status(201)
         .json({ statusCode: 0, message: 'Синхронизация todo прошла успешно' })
     } catch (e) {
-      res
-        .status(500)
-        .json({
-          statusCode: 1,
-          message: 'Что-то пошло не так, попробуйте снова',
-        })
+      res.status(500).json({
+        statusCode: 1,
+        message: 'Что-то пошло не так, попробуйте снова',
+      })
     }
   }
 )
@@ -63,15 +61,15 @@ router.post(
         })
       }
 
-      const { idGenerator, todoListArr, todoContentObj } = todo
+      const { idGenerator, todoTitles, todoContent } = todo
 
       res.json({
         statusCode: 0,
-        message: null,
+        message: 'TodoData успешно загружены с сервера',
         todoData: {
           idGenerator,
-          todoListArr,
-          todoContentObj,
+          todoTitles,
+          todoContent,
         },
       })
     } catch (e) {

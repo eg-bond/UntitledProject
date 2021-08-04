@@ -1,4 +1,5 @@
 import { LoginFormDataType } from '../pages/login/AuthPage'
+import { TodoInitialStateT } from '../redux/todoReduser'
 
 // Auth
 type DefServerResponse = {
@@ -64,12 +65,15 @@ export type GetTodoReturnTypeAddition = {
   todoData: TodoAPIInitialStateType
 }
 
+type ServerTodoDataT = Omit<
+  TodoInitialStateT,
+  'currentTodoId' | 'selectedContentItem'
+>
+
 export const todoAPI = {
-  async syncTodo(
-    todoState: TodoAPIInitialStateType
-  ): Promise<DefServerResponse> {
+  async syncTodo(): Promise<DefServerResponse> {
+    const todoState = JSON.parse(localStorage.todoData)
     const { token } = JSON.parse(localStorage.userData)
-    // const reqPayload = { ...todoState, ...token }
     const body = JSON.stringify({ ...todoState, token })
 
     //@ts-ignore
