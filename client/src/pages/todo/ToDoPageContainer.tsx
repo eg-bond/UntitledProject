@@ -58,7 +58,9 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
     todoContent: currentTodoState.todoContent,
     todoTitles: currentTodoState.todoTitles,
   }
-
+  // if (true) {
+  //   throw Error('')
+  // }
   const [synchronizedWithLS, syncWithLS] = useState(false)
 
   const getTodosFromServer = async () => {
@@ -77,6 +79,11 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
     props.setInitialTodoData(JSON.parse(localStorage.todoData))
     syncWithLS(true)
   }
+
+  // const LStodoData = localStorage.todoData
+  // const { token } = localStorage.userData
+  // console.log(LStodoData)
+  // console.log(token)
 
   useEffect(() => {
     // Загружаем данные из LocalStorage в стейт после вмонтирования компоненты

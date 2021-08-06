@@ -7,7 +7,6 @@ import 'materialize-css'
 import Navbar from './components/Navbar'
 import { Routes } from './components/Routes'
 import { AppStateType } from './redux/store'
-import { getTodo } from './redux/todoReduser'
 
 const App: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({
   isAuth,
@@ -16,7 +15,6 @@ const App: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({
   lastname,
   getAuthData,
   isFetching,
-  getTodo,
 }) => {
   //if token in LS exists - get userData from server
 
@@ -28,7 +26,6 @@ const App: React.FC<mapStateToPropsType & mapDispatchToPropsType> = ({
     }
     if (!!token) {
       getAuthData(token)
-      // getTodo()
     }
   }, [])
 
@@ -55,7 +52,6 @@ type mapStateToPropsType = {
 type mapDispatchToPropsType = {
   logout: () => void
   getAuthData: (token: string) => void
-  getTodo: () => void
 }
 
 const mapStateToProps = (state: AppStateType): mapStateToPropsType => ({
@@ -67,6 +63,5 @@ const mapStateToProps = (state: AppStateType): mapStateToPropsType => ({
 
 export default connect(mapStateToProps, {
   logout: authActions.logout,
-  getTodo,
   getAuthData,
 })(App)

@@ -6,11 +6,5 @@ const schema = new Schema({
   todoContent: Schema.Types.Mixed,
   owner: { type: Types.ObjectId, ref: 'User' },
 })
-// const schema = new Schema({
-//     idGenerator: Number,
-//     todoListArr: [],
-//     todoContentObj: Schema.Types.Mixed,
-//     owner: {type: Types.ObjectId, ref: 'User'}
-// });
 
 module.exports = model('Todo', schema)

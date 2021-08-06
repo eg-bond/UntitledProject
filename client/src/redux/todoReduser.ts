@@ -1,9 +1,4 @@
-import {
-  authAPI,
-  AuthDataType,
-  todoAPI,
-  TodoAPIInitialStateType,
-} from '../api/api'
+import { authAPI, AuthDataType, todoAPI } from '../api/api'
 import { ThunkAction } from 'redux-thunk'
 import { AppStateType, InferActionsTypes } from './store'
 import { LoginFormDataType } from '../pages/login/AuthPage'
@@ -193,7 +188,6 @@ export const todoReduser = (
 }
 
 type InferredTodoActionsT = InferActionsTypes<typeof actions>
-type ThunkType = ThunkAction<void, AppStateType, unknown, InferredTodoActionsT>
 
 export const actions = {
   addTodo: () => ({ type: 'todo/ADD_TODO' } as const),
@@ -224,28 +218,18 @@ export const actions = {
   ) => ({ type: 'todo/SET_INITIAL_TODO_DATA', todoData } as const),
 }
 
-export const getTodo = (): ThunkType => {
-  return async dispatch => {
-    // dispatch(authActions.fetchInProgress(true)) // из authReduser
-    let responseData = await todoAPI.getTodo()
-    if (responseData.statusCode === 0) {
-      dispatch(actions.setInitialTodoData(responseData.todoData))
-    }
+// type ThunkType = ThunkAction<void, AppStateType, unknown, InferredTodoActionsT>
 
-    // dispatch(authActions.fetchInProgress(false))
-  }
-}
+// export const getTodo = (): ThunkType => {
+//   return async dispatch => {
+//     dispatch(authActions.fetchInProgress(true)) // из authReduser
+//     let responseData = await todoAPI.getTodo()
+//     if (responseData.statusCode === 0) {
+//       dispatch(actions.setInitialTodoData(responseData.todoData))
+//     }
 
-export const syncTodoWithServer = (): ThunkType => {
-  return async dispatch => {
-    // dispatch(authActions.fetchInProgress(true)) // из authReduser
-    let responseData = await todoAPI.getTodo()
-    if (responseData.statusCode === 0) {
-      dispatch(actions.setInitialTodoData(responseData.todoData))
-    }
-
-    // dispatch(authActions.fetchInProgress(false))
-  }
-}
+//     dispatch(authActions.fetchInProgress(false))
+//   }
+// }
 
 export default todoReduser
