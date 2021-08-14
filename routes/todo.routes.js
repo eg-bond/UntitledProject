@@ -10,7 +10,8 @@ router.post(
 
   async (req, res) => {
     try {
-      const { idGenerator, todoTitles, todoContent, token } = req.body
+      const { idGenerator, todoTitles, todoContent, lastUpdate, token } =
+        req.body
 
       const decoded = jwt.verify(token, config.get('jwtSecret'))
       const { userId } = decoded
@@ -19,12 +20,18 @@ router.post(
       const todo = await Todo.findOne({ owner: userId })
 
       if (todo) {
-        await todo.updateOne({ idGenerator, todoTitles, todoContent })
+        await todo.updateOne({
+          idGenerator,
+          todoTitles,
+          todoContent,
+          lastUpdate,
+        })
       } else {
         const todo = new Todo({
           idGenerator,
           todoTitles,
           todoContent,
+          lastUpdate,
           owner: user.id,
         })
         await todo.save()
@@ -61,7 +68,7 @@ router.post(
         })
       }
 
-      const { idGenerator, todoTitles, todoContent } = todo
+      const { idGenerator, todoTitles, todoContent, lastUpdate } = todo
 
       res.json({
         statusCode: 0,
@@ -70,6 +77,7 @@ router.post(
           idGenerator,
           todoTitles,
           todoContent,
+          lastUpdate,
         },
       })
     } catch (e) {

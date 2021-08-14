@@ -63,6 +63,7 @@ export const todoAPI = {
 
   async getTodo(): Promise<DefResponseT & { todoData: DB_TodoDataT }> {
     const body = localStorage.userData
+    console.log('gettingTodo')
     const response = await fetch('/api/todo/get_todo', {
       method: 'POST',
       body,

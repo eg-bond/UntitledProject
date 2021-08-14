@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { connect, ConnectedProps, useStore } from 'react-redux'
 import { AppStateType } from '../../redux/store'
 import { actions, TodoInitialStateT } from '../../redux/todoReduser'
@@ -6,6 +6,57 @@ import { useParams, useHistory } from 'react-router-dom'
 import { todoAPI } from '../../api/api'
 import ToDoPage from './ToDoPage'
 import TodoToolbar from '../../components/TodoToolbar'
+import { handleLSData, handleLSDataDebounceP } from '../../helpers/helpers'
+
+export function useDebounce(value, delay) {
+  // Состояние и сеттер для отложенного значения
+  const [debouncedValue, setDebouncedValue] = useState(value)
+
+  useEffect(
+    () => {
+      // Выставить debouncedValue равным value (переданное значение)
+      // после заданной задержки
+      const handler = setTimeout(() => {
+        setDebouncedValue(value)
+      }, delay)
+
+      // Вернуть функцию очистки, которая будет вызываться каждый раз, когда ...
+      // ... useEffect вызван снова. useEffect будет вызван снова, только если ...
+      // ... value будет изменено (смотри ниже массив зависимостей).
+      // Так мы избегаем изменений debouncedValue, если значение value ...
+      // ... поменялось в рамках интервала задержки.
+      // Таймаут очищается и стартует снова.
+      // Что бы сложить это воедино: если пользователь печатает что-то внутри ...
+      // ... нашего приложения в поле поиска, мы не хотим, чтобы debouncedValue...
+      // ... не менялось до тех пор, пока он не прекратит печатать дольше, чем 500ms.
+      return () => {
+        clearTimeout(handler)
+      }
+    },
+    // Вызывается снова, только если значение изменится
+    // мы так же можем добавить переменную "delay" в массива зависимостей ...
+    // ... если вы собираетесь менять ее динамически.
+    [value]
+  )
+
+  return debouncedValue
+}
+
+// export function useDebounceFn(fn, delay) {
+//   const [call, setCall] = useState(false)
+//   useEffect(() => {
+//     const handler = setTimeout(() => {
+//       setCall(true)
+//     }, delay)
+
+//     return () => {
+//       clearTimeout(handler)
+//     }
+//   }, [fn])
+
+//   if (call) {
+//   }
+// }
 
 const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
   idGenerator,
@@ -22,7 +73,7 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
 }) => {
   let history = useHistory()
   let { todoId } = useParams<{ todoId: string }>()
-  let currentTodoState: TodoInitialStateT = useStore().getState().todo
+  // let currentTodoState: TodoInitialStateT = useStore().getState().todo
   let idArr = Object.keys(todoTitles)
 
   const deleteTodoHandler = (thisTodoId: string) => {
@@ -47,51 +98,45 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
     deleteTodo(thisTodoId)
   }
 
-  const objectsIsNotEqual = (obj1: any, obj2: any) => {
-    let keys = Object.keys(obj1)
-    return keys.some(
-      key => JSON.stringify(obj1[key]) !== JSON.stringify(obj2[key])
-    )
-  }
-  let currentStore = {
-    idGenerator: currentTodoState.idGenerator,
-    todoContent: currentTodoState.todoContent,
-    todoTitles: currentTodoState.todoTitles,
-  }
+  // let currentStore = {
+  //   idGenerator: currentTodoState.idGenerator,
+  //   todoContent: currentTodoState.todoContent,
+  //   todoTitles: currentTodoState.todoTitles,
+  // }
   // if (true) {
   //   throw Error('')
   // }
+
+  // Tells< that
   const [synchronizedWithLS, syncWithLS] = useState(false)
 
   const getTodosFromServer = async () => {
     let { todoData } = await todoAPI.getTodo()
 
     if (!localStorage.todoData) {
-      localStorage.todoData = JSON.stringify(todoData)
-    }
-
-    if (!!localStorage.todoData) {
-      if (objectsIsNotEqual(todoData, JSON.parse(localStorage.todoData))) {
-        localStorage.todoData = JSON.stringify(todoData)
+      handleLSData('set', 'todoData', todoData)
+    } else {
+      let { lastUpdate } = handleLSData('get', 'todoData')
+      // LS data outdated
+      if (todoData.lastUpdate > lastUpdate) {
+        debugger
+        handleLSData('set', 'todoData', todoData)
+      }
+      // DB data outdated
+      if (todoData.lastUpdate < lastUpdate) {
+        debugger
+        todoAPI.syncTodo()
       }
     }
-
-    props.setInitialTodoData(JSON.parse(localStorage.todoData))
-    syncWithLS(true)
+    return Promise.resolve()
   }
-
-  // const LStodoData = localStorage.todoData
-  // const { token } = localStorage.userData
-  // console.log(LStodoData)
-  // console.log(token)
 
   useEffect(() => {
     // Загружаем данные из LocalStorage в стейт после вмонтирования компоненты
-    getTodosFromServer()
-
-    // if (idArr[0]) {
-    //   history.push(`/todo/${idArr[0]}`)
-    // }
+    getTodosFromServer().then(() => {
+      props.setInitialTodoData(handleLSData('get', 'todoData'))
+      syncWithLS(true)
+    })
 
     return () => {
       // let currentTodoState = currentStore.getState().todo
@@ -109,13 +154,14 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
   //state changed and need to be placed in LS
   useEffect(() => {
     if (synchronizedWithLS) {
-      localStorage.todoData = JSON.stringify({
+      handleLSDataDebounceP('set', 'todoData', {
         idGenerator,
         todoTitles,
         todoContent,
-      })
+      }).then(() => console.log('done'))
 
-      todoAPI.syncTodo()
+      // delayedLSDataHandler('set', 'test', todoTitles)
+      // todoAPI.syncTodo()
     }
   }, [todoTitles, todoContent])
 
