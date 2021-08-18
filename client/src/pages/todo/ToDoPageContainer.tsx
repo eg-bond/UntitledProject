@@ -1,139 +1,160 @@
 import React, { useEffect, useState } from 'react'
-import { connect, useStore } from 'react-redux'
-import { compose } from 'redux'
+import { connect, ConnectedProps, useStore } from 'react-redux'
 import { AppStateType } from '../../redux/store'
-import { actions, TodoInitialStateType } from '../../redux/todoReduser'
-import { useParams, useHistory, withRouter } from 'react-router-dom'
-import { todoAPI } from '../../api/api'
-import ToDoPageNew from './ToDoPageNew'
+import { actions } from '../../redux/todoReduser'
+import { useParams, useHistory } from 'react-router-dom'
+import { DB_TodoDataT, todoAPI } from '../../api/api'
+import ToDoPage from './ToDoPage'
+import TodoToolbar from '../../components/TodoToolbar'
+import { handleLSData, setLSDataDebounceP } from '../../helpers/helpers'
 
-const ToDoPageContainer: React.FC<
-  MapStateToPropsType & MapDispatchToPropsType & WithRouterPropsType
-> = ({
-  todoListArr,
-  selectedTodo,
+const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
+  idGenerator,
+  todoTitles,
+  todoContent,
+  currentTodoId,
+  selectedContentItem,
   addTodo,
   deleteTodo,
-  addTodoContentItem,
-  deleteTodoContentItem,
   selectTodo,
+  selectContentItem,
   modifyTodoContent,
   ...props
 }) => {
   let history = useHistory()
-  // @ts-ignore
-  let { todoId } = useParams()
-  let currentStore = useStore()
+  let { todoId } = useParams<{ todoId: string }>()
+  let idArr = Object.keys(todoTitles)
 
+  // Оптимизировать и убрать
   const deleteTodoHandler = (thisTodoId: string) => {
-    deleteTodo(thisTodoId)
-
     if (todoId === thisTodoId) {
-      let index = todoListArr.findIndex(item => item.id === thisTodoId)
+      let index = idArr.findIndex(item => item === thisTodoId)
 
       let nextTodoUrl = () =>
         index === 0
-          ? history.push(`/todo/${todoListArr[index + 1].id}`)
-          : history.push(`/todo/${todoListArr[index - 1].id}`)
-
+          ? history.push(`/todo/${idArr[index + 1]}`)
+          : history.push(`/todo/${idArr[index - 1]}`)
       let emptyTodoUrl = () => history.push(`/todo`)
 
-      todoListArr.length > 1 ? nextTodoUrl() : emptyTodoUrl()
+      const noTodosHandler = () => {
+        selectTodo(null)
+        selectContentItem(null)
+        emptyTodoUrl()
+      }
+
+      idArr.length > 1 ? nextTodoUrl() : noTodosHandler()
     }
+
+    deleteTodo(thisTodoId)
   }
 
-  type ContentItemType = {
-    value: string
-    importance: string
-    orderNum: number
-  }
-  type BodyType = {
-    idGenerator: number
-    todoListArr: Array<{ title: string; id: string }>
-    todoContentObj: {
-      [key: string]: Array<ContentItemType>
+  // Сделать переиспользуемой и вынести
+  const getTodosFromServer = async () => {
+    let { todoData } = await todoAPI.getTodo()
+
+    if (!localStorage.todoData) {
+      handleLSData.set('todoData', todoData)
+    } else {
+      let { lastUpdate } = handleLSData.get<DB_TodoDataT>('todoData')
+      // LS data outdated
+      if (todoData.lastUpdate > lastUpdate) {
+        debugger
+        handleLSData.set('todoData', todoData)
+      }
+      // DB data outdated
+      if (todoData.lastUpdate < lastUpdate) {
+        debugger
+        todoAPI.syncTodo()
+      }
     }
+    return Promise.resolve()
   }
+
+  // Swithces to "true" after initial LS->state sunchronization
+  // and enables LS->DB sunc if LS data changed
+  const [synchronizedWithLS, syncWithLS] = useState(false)
 
   useEffect(() => {
-    return () => {
-      let currentTodoState = currentStore.getState().todo
+    // Fill state with LS data after initial component mount
+    getTodosFromServer().then(() => {
+      props.setInitialTodoData(handleLSData.get<DB_TodoDataT>('todoData'))
+      syncWithLS(true)
+    })
 
-      let body = {
-        idGenerator: currentTodoState.idGenerator,
-        todoListArr: currentTodoState.todoListArr,
-        todoContentObj: currentTodoState.todoContentObj,
-      }
-      todoAPI.syncTodo(body)
+    return () => {
+      todoAPI.syncTodo()
+      selectTodo(null)
+      selectContentItem(null)
     }
   }, [])
 
+  // update LS after state change (with debouce delay)
+  useEffect(() => {
+    if (synchronizedWithLS) {
+      setLSDataDebounceP('todoData', {
+        idGenerator,
+        todoTitles,
+        todoContent,
+      }).then(() => todoAPI.syncTodo())
+    }
+  }, [todoTitles, todoContent])
+
+  // change state.currentTodoId if url changed
+  useEffect(() => {
+    selectTodo(todoId)
+  }, [todoId])
+
   return (
-    <ToDoPageNew
-      todoListArr={todoListArr}
-      selectedTodo={selectedTodo}
-      addTodo={addTodo}
-      deleteTodo={deleteTodo}
-      addTodoContentItem={addTodoContentItem}
-      deleteTodoContentItem={deleteTodoContentItem}
-      selectTodo={selectTodo}
-      modifyTodoContent={modifyTodoContent}
-      changeTodoTitle={props.changeTodoTitle}
-      deleteTodoHandler={deleteTodoHandler}
-    />
+    <>
+      <TodoToolbar
+        todoId={todoId}
+        todoContent={todoContent}
+        todoTitles={todoTitles}
+        selectedContentItem={selectedContentItem}
+        modifyTodoContent={modifyTodoContent}
+        modifyTodoTitle={props.modifyTodoTitle}
+      />
+      <ToDoPage
+        todoId={todoId}
+        todoTitles={todoTitles}
+        todoContent={todoContent}
+        currentTodoId={currentTodoId}
+        selectedContentItem={selectedContentItem}
+        addTodo={addTodo}
+        deleteTodo={deleteTodo}
+        addTodoContentItem={props.addTodoContentItem}
+        deleteTodoContentItem={props.deleteTodoContentItem}
+        selectTodo={selectTodo}
+        selectContentItem={selectContentItem}
+        modifyTodoContent={modifyTodoContent}
+        modifyTodoTitle={props.modifyTodoTitle}
+        deleteTodoHandler={deleteTodoHandler}
+      />
+    </>
   )
 }
 
-const mapStateToProps = (state: AppStateType): MapStateToPropsType => ({
+const mapStateToProps = (state: AppStateType) => ({
   idGenerator: state.todo.idGenerator,
-  todoListArr: state.todo.todoListArr,
-  todoContentObj: state.todo.todoContentObj,
-  selectedTodo: state.todo.selectedTodo,
+  todoTitles: state.todo.todoTitles,
+  todoContent: state.todo.todoContent,
+  currentTodoId: state.todo.currentTodoId,
+  selectedContentItem: state.todo.selectedContentItem,
 })
 
-export default compose(
-  connect<
-    MapStateToPropsType,
-    MapDispatchToPropsType,
-    WithRouterPropsType,
-    AppStateType
-  >(mapStateToProps, {
-    addTodo: actions.addTodo,
-    deleteTodo: actions.deleteTodo,
-    addTodoContentItem: actions.addTodoContentItem,
-    deleteTodoContentItem: actions.deleteTodoContentItem,
-    selectTodo: actions.selectTodo,
-    changeTodoTitle: actions.changeTodoTitle,
-    modifyTodoContent: actions.modifyTodoContent,
-  }),
-  withRouter
-)(ToDoPageContainer)
+const mapDispatchToProps = {
+  setInitialTodoData: actions.setInitialTodoData,
+  addTodo: actions.addTodo,
+  deleteTodo: actions.deleteTodo,
+  addTodoContentItem: actions.addTodoContentItem,
+  deleteTodoContentItem: actions.deleteTodoContentItem,
+  selectTodo: actions.selectTodo,
+  selectContentItem: actions.selectContentItem,
+  modifyTodoTitle: actions.modifyTodoTitle,
+  modifyTodoContent: actions.modifyTodoContent,
+}
 
-type WithRouterPropsType = {
-  match: any
-  history: Array<string>
-}
-export type MapStateToPropsType = {
-  idGenerator?: number
-  todoListArr: TodoInitialStateType['todoListArr']
-  todoContentObj?: TodoInitialStateType['todoContentObj']
-  selectedTodo: TodoInitialStateType['selectedTodo']
-}
-export type MapDispatchToPropsType = {
-  addTodo: () => void
-  deleteTodo: (todoId: string) => void
-  addTodoContentItem: (
-    todoId: string,
-    value: string,
-    importance: string
-  ) => void
-  deleteTodoContentItem: (todoId: string, orderNum: number) => void
-  selectTodo: (todoId: string) => void
-  changeTodoTitle: (todoId: string, title: string) => void
-  modifyTodoContent: (
-    todoId: string,
-    value: string,
-    importance: string,
-    orderNum: number
-  ) => void
-}
+const connector = connect(mapStateToProps, mapDispatchToProps)
+export type TodoReduxPropsT = ConnectedProps<typeof connector>
+
+export default connector(ToDoPageContainer)

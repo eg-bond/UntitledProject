@@ -108,14 +108,13 @@ router.post(
       }
 
       const token = jwt.sign({ userId: user.id }, config.get('jwtSecret'), {
-        expiresIn: '1h',
+        expiresIn: '10h',
       })
 
       res.json({
         statusCode: 0,
-        message: '',
+        message: 'Данные пользователя успешно получены',
         authData: {
-          userId: user.id,
           name: user.name,
           lastname: user.lastname,
           nickname: user.nickname,
@@ -151,7 +150,6 @@ router.post(
         statusCode: 0,
         message: '',
         authData: {
-          userId: user.id,
           name: user.name,
           lastname: user.lastname,
           nickname: user.nickname,

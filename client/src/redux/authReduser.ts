@@ -1,10 +1,9 @@
-import { authAPI, AuthDataType } from '../api/api'
+import { authAPI, DB_AuthDataT } from '../api/api'
 import { ThunkAction } from 'redux-thunk'
 import { AppStateType, InferActionsTypes } from './store'
 import { LoginFormDataType } from '../pages/login/AuthPage'
 
 let initialState = {
-  userId: null as string | null,
   email: null as string | null,
   name: null as string | null,
   lastname: null as string | null,
@@ -35,7 +34,6 @@ export const authReduser = (
       localStorage.removeItem('userData')
       return {
         ...state,
-        userId: null,
         email: null,
         name: null,
         lastname: null,
@@ -54,7 +52,7 @@ type ThunkType = ThunkAction<Promise<void>, AppStateType, unknown, ActionsTypes>
 export const authActions = {
   fetchInProgress: (inProgress: boolean) =>
     ({ type: 'FETCH_IN_PROGRESS', inProgress } as const),
-  setAuthData: (authData: AuthDataType) =>
+  setAuthData: (authData: DB_AuthDataT) =>
     ({ type: 'SET_AUTH_DATA', authData } as const),
   logout: () => ({ type: 'LOGOUT' } as const),
 }
@@ -62,15 +60,12 @@ export const authActions = {
 export const getAuthData = (token: string): ThunkType => {
   return async dispatch => {
     dispatch(authActions.fetchInProgress(true))
-
     let responseData = await authAPI.me(token)
-
     if (responseData.statusCode === 0) {
       dispatch(authActions.setAuthData(responseData.authData))
     } else {
       localStorage.removeItem('userData')
     }
-
     dispatch(authActions.fetchInProgress(false))
   }
 }

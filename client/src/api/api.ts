@@ -1,30 +1,24 @@
 import { LoginFormDataType } from '../pages/login/AuthPage'
+import { TodoInitialStateT } from '../redux/todoReduser'
 
-// Auth
-type DefServerResponse = {
+export type DefResponseT = {
   statusCode: number
   message: string | null
 }
 
-export type AuthDataType = {
-  userId: string
+// Auth
+export type DB_AuthDataT = {
   email: string
   name: string
   lastname: string
   nickname: string
 }
-type AuthResponse = {
-  authData: AuthDataType
-}
-
-type TokenResponse = {
-  token: string | null
-}
 
 export const authAPI = {
+  //Sign in with email and pass
   async login(
     formData: LoginFormDataType
-  ): Promise<DefServerResponse & AuthResponse & TokenResponse> {
+  ): Promise<DefResponseT & { authData: DB_AuthDataT } & { token: string }> {
     const body = JSON.stringify(formData)
 
     const response = await fetch('/api/auth/login', {
@@ -35,7 +29,7 @@ export const authAPI = {
     return response.json()
   },
   // Authentification by token when logged
-  async me(token: string): Promise<DefServerResponse & AuthResponse> {
+  async me(token: string): Promise<DefResponseT & { authData: DB_AuthDataT }> {
     const body = JSON.stringify(token)
 
     const response = await fetch('/api/auth/me', {
@@ -48,31 +42,17 @@ export const authAPI = {
 }
 
 // Todo
-type ContentItemType = {
-  value: string
-  importance: string
-  orderNum: number
-}
-export type TodoAPIInitialStateType = {
-  idGenerator: number
-  todoListArr: Array<{ title: string; id: string }>
-  todoContentObj: {
-    [key: string]: Array<ContentItemType>
-  }
-}
-export type GetTodoReturnTypeAddition = {
-  todoData: TodoAPIInitialStateType
-}
+export type DB_TodoDataT = Omit<
+  TodoInitialStateT,
+  'currentTodoId' | 'selectedContentItem'
+> & { lastUpdate: number }
 
 export const todoAPI = {
-  async syncTodo(
-    todoState: TodoAPIInitialStateType
-  ): Promise<DefServerResponse> {
-    const { token } = JSON.parse(localStorage.userData)
-    // const reqPayload = { ...todoState, ...token }
-    const body = JSON.stringify({ ...todoState, token })
+  async syncTodo(): Promise<DefResponseT> {
+    const LStodoData: DB_TodoDataT = JSON.parse(localStorage.todoData)
+    const { token }: { token: string } = JSON.parse(localStorage.userData)
+    const body = JSON.stringify({ ...LStodoData, token })
 
-    //@ts-ignore
     const response = await fetch('/api/todo/sync_todo', {
       method: 'POST',
       body,
@@ -80,8 +60,10 @@ export const todoAPI = {
     })
     return response.json()
   },
-  async getTodo(): Promise<DefServerResponse & GetTodoReturnTypeAddition> {
+
+  async getTodo(): Promise<DefResponseT & { todoData: DB_TodoDataT }> {
     const body = localStorage.userData
+    console.log('gettingTodo')
     const response = await fetch('/api/todo/get_todo', {
       method: 'POST',
       body,

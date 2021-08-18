@@ -1,23 +1,20 @@
-@import "~materialize-css/dist/css/materialize.min.css"; /*подключаем стили из materialize-css*/
-
+@import '~materialize-css/dist/css/materialize.min.css'; /*подключаем стили из materialize-css*/
 @import 'styles/navbar.css';
 @import 'styles/todo.css';
 
 body {
   margin: 0;
   font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', 'Roboto', 'Oxygen',
-  'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
-  sans-serif;
+    'Ubuntu', 'Cantarell', 'Fira Sans', 'Droid Sans', 'Helvetica Neue',
+    sans-serif;
   -webkit-font-smoothing: antialiased;
   -moz-osx-font-smoothing: grayscale;
 }
 
 code {
   font-family: source-code-pro, Menlo, Monaco, Consolas, 'Courier New',
-  monospace;
+    monospace;
 }
-
-
 
 /*Auth and registration*/
 .auth__button {
@@ -30,12 +27,11 @@ code {
 
 .auth__createLink_a {
   color: orange;
-  transition: ease-out .2s;
+  transition: ease-out 0.2s;
 }
 .auth__createLink_a:hover {
   color: #ff4810;
 }
-
 
 .input-field input {
   color: white;
@@ -59,4 +55,3 @@ code {
   border-bottom: orange !important;
   box-shadow: 0 1px 0 0 orange !important;
 }
-
