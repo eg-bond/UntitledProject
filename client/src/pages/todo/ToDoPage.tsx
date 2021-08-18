@@ -1,13 +1,10 @@
 import React, { useEffect, useState } from 'react'
-import { NavLink, useParams } from 'react-router-dom'
+import { NavLink } from 'react-router-dom'
 import { TodoContentItem } from './TodoContentItem'
 import { TodoReduxPropsT } from './ToDoPageContainer'
 
 interface ToDoPagePropsT
-  extends Omit<
-    TodoReduxPropsT,
-    'selectedContentItem' | 'idGenerator' | 'setInitialTodoData'
-  > {
+  extends Omit<TodoReduxPropsT, 'idGenerator' | 'setInitialTodoData'> {
   todoId: string
   deleteTodoHandler: (thisTodoId: string) => void
 }
@@ -17,6 +14,7 @@ const ToDoPage: React.FC<ToDoPagePropsT> = ({
   todoTitles,
   currentTodoId,
   todoContent,
+  selectedContentItem,
   addTodo,
   addTodoContentItem,
   deleteTodoContentItem,
@@ -43,6 +41,8 @@ const ToDoPage: React.FC<ToDoPagePropsT> = ({
     textDecoration: underline ? 'underline' : 'none',
     fontStyle: italic ? 'italic' : 'normal',
     color: color,
+    borderBottom:
+      selectedContentItem === 'title' ? '1px solid red' : '1px solid #9e9e9e',
   }
 
   return (
@@ -79,12 +79,13 @@ const ToDoPage: React.FC<ToDoPagePropsT> = ({
         )}
         {todoId && (
           <div className='selectedTodo__items'>
-            {todoContent[todoId].map(contentItem => (
+            {todoContent[todoId].map((contentItem, i) => (
               <div
                 key={`${todoId}_${contentItem.order}`}
                 className='selectedTodo__item'>
                 <TodoContentItem
                   modifyTodoContent={modifyTodoContent}
+                  active={selectedContentItem === i ? true : false}
                   selectContentItem={selectContentItem}
                   itemProps={{ ...contentItem }}
                 />

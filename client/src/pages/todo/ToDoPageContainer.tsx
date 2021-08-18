@@ -119,6 +119,7 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
         todoTitles={todoTitles}
         todoContent={todoContent}
         currentTodoId={currentTodoId}
+        selectedContentItem={selectedContentItem}
         addTodo={addTodo}
         deleteTodo={deleteTodo}
         addTodoContentItem={props.addTodoContentItem}

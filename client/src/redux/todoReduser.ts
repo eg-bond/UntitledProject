@@ -53,7 +53,7 @@ export const todoReduser = (
         todoTitles: {
           ...state.todoTitles,
           [`eg_bond_todo${state.idGenerator}`]: {
-            value: `eb_${state.idGenerator}_title`,
+            value: 'Без заголовка',
           },
         },
         todoContent: {
@@ -138,10 +138,10 @@ export const todoReduser = (
         },
       }
       if (state.selectedContentItem !== null) {
-        newState.todoContent[String(state.currentTodoId)][
+        newState.todoContent[state.currentTodoId!][
           Number(state.selectedContentItem)
         ] = {
-          ...state.todoContent[String(state.currentTodoId)][
+          ...state.todoContent[state.currentTodoId!][
             Number(state.selectedContentItem)
           ],
           ...action.itemProps,

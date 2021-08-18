@@ -6,12 +6,14 @@ type ContentItemPropsT = {
   modifyTodoContent: TodoReduxPropsT['modifyTodoContent']
   selectContentItem: TodoReduxPropsT['selectContentItem']
   itemProps: TodoItemPropsT
+  active: boolean
 }
 
 export const TodoContentItem: React.FC<ContentItemPropsT> = ({
   selectContentItem,
   modifyTodoContent,
   itemProps,
+  active,
 }) => {
   const { value, order, color, bold, italic, underline } = itemProps
 
@@ -36,6 +38,7 @@ export const TodoContentItem: React.FC<ContentItemPropsT> = ({
     textDecoration: underline ? 'underline' : 'none',
     fontStyle: italic ? 'italic' : 'normal',
     color,
+    borderBottom: active ? '1px solid red' : '1px solid #9e9e9e',
   }
 
   return (

@@ -76,11 +76,7 @@ const TodoToolbar: React.FC<ContentItemPropsT> = ({
         onClick={() => modify({ color: 'green' })}>
         Зеленый
       </button>
-      <button
-        style={{ backgroundColor: color === 'black' ? 'red' : 'transparent' }}
-        onClick={() => modify({ color: 'black' })}>
-        Без цвета
-      </button>
+      <button onClick={() => modify({ color: 'black' })}>Без цвета</button>
 
       <button
         onClick={() =>
