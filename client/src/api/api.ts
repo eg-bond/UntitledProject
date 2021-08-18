@@ -45,7 +45,7 @@ export const authAPI = {
 export type DB_TodoDataT = Omit<
   TodoInitialStateT,
   'currentTodoId' | 'selectedContentItem'
->
+> & { lastUpdate: number }
 
 export const todoAPI = {
   async syncTodo(): Promise<DefResponseT> {
