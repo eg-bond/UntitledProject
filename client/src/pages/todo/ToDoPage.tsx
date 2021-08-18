@@ -69,7 +69,7 @@ const ToDoPage: React.FC<ToDoPagePropsT> = ({
         {todoId && (
           <input
             style={{ ...titleStyles }}
-            onBlur={() => props.changeTodoTitle({ value: localTodoTitle })}
+            onBlur={() => props.modifyTodoTitle({ value: localTodoTitle })}
             onKeyDown={(e: any) => e.key === 'Enter' && e.target.blur()}
             onFocus={() => selectContentItem('title')}
             onChange={e => setLocalTodoTitle(e.target.value)}

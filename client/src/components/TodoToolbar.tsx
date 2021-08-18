@@ -8,7 +8,7 @@ type ContentItemPropsT = Pick<
   | 'modifyTodoContent'
   | 'todoContent'
   | 'selectedContentItem'
-  | 'changeTodoTitle'
+  | 'modifyTodoTitle'
 > & { todoId: string }
 
 const TodoToolbar: React.FC<ContentItemPropsT> = ({
@@ -17,7 +17,7 @@ const TodoToolbar: React.FC<ContentItemPropsT> = ({
   todoContent,
   selectedContentItem,
   modifyTodoContent,
-  changeTodoTitle,
+  modifyTodoTitle,
 }) => {
   if (!todoId) {
     return null
@@ -39,7 +39,7 @@ const TodoToolbar: React.FC<ContentItemPropsT> = ({
 
   const modify = (propsToModify: Partial<TodoItemPropsT>) => {
     if (selectedContentItem === 'title') {
-      changeTodoTitle({ ...propsToModify })
+      modifyTodoTitle({ ...propsToModify })
     } else {
       modifyTodoContent({ ...propsToModify })
     }

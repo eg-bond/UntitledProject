@@ -1,19 +1,3 @@
-// export function handleLSData<R extends object>(
-//   action: 'set' | 'get',
-//   field: string,
-//   data?: object
-// ): R | null {
-//   if (action === 'set') {
-//     localStorage[field] = JSON.stringify({ ...data, lastUpdate: Date.now() })
-//     return null
-//   }
-//   if (action === 'get') {
-//     return JSON.parse(localStorage[field])
-//   }
-//   return null
-//   // throw new Error('LS handler receive wrong action')
-// }
-
 export const handleLSData = {
   get: function <R>(field: string): R {
     return JSON.parse(localStorage[field])
@@ -22,20 +6,6 @@ export const handleLSData = {
     localStorage[field] = JSON.stringify({ ...data, lastUpdate: Date.now() })
   },
 }
-// (
-//   field: string,
-//   data?: object
-// ): R | null {
-//   if (action === 'set') {
-//     localStorage[field] = JSON.stringify({ ...data, lastUpdate: Date.now() })
-//     return null
-//   }
-//   if (action === 'get') {
-//     return JSON.parse(localStorage[field])
-//   }
-//   return null
-// throw new Error('LS handler receive wrong action')
-// }
 
 export function debounce<argsT extends any[], R>(
   fn: (...args: argsT) => R,
@@ -61,8 +31,8 @@ export function debounceP<argsT extends any[], R>(
   }
 }
 
-export const handleLSDataDebounce = debounce(handleLSData.set, 1000)
-export const handleLSDataDebounceP = debounceP(handleLSData.set, 1000)
+export const setLSDataDebounce = debounce(handleLSData.set, 1000)
+export const setLSDataDebounceP = debounceP(handleLSData.set, 1000)
 
 // const objectsIsNotEqual = (obj1: object, obj2: object) => {
 //   let keys = Object.keys(obj1)

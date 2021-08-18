@@ -1,62 +1,12 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { connect, ConnectedProps, useStore } from 'react-redux'
 import { AppStateType } from '../../redux/store'
-import { actions, TodoInitialStateT } from '../../redux/todoReduser'
+import { actions } from '../../redux/todoReduser'
 import { useParams, useHistory } from 'react-router-dom'
 import { DB_TodoDataT, todoAPI } from '../../api/api'
 import ToDoPage from './ToDoPage'
 import TodoToolbar from '../../components/TodoToolbar'
-import { handleLSData, handleLSDataDebounceP } from '../../helpers/helpers'
-
-// export function useDebounce(value, delay) {
-//   // Состояние и сеттер для отложенного значения
-//   const [debouncedValue, setDebouncedValue] = useState(value)
-
-//   useEffect(
-//     () => {
-//       // Выставить debouncedValue равным value (переданное значение)
-//       // после заданной задержки
-//       const handler = setTimeout(() => {
-//         setDebouncedValue(value)
-//       }, delay)
-
-//       // Вернуть функцию очистки, которая будет вызываться каждый раз, когда ...
-//       // ... useEffect вызван снова. useEffect будет вызван снова, только если ...
-//       // ... value будет изменено (смотри ниже массив зависимостей).
-//       // Так мы избегаем изменений debouncedValue, если значение value ...
-//       // ... поменялось в рамках интервала задержки.
-//       // Таймаут очищается и стартует снова.
-//       // Что бы сложить это воедино: если пользователь печатает что-то внутри ...
-//       // ... нашего приложения в поле поиска, мы не хотим, чтобы debouncedValue...
-//       // ... не менялось до тех пор, пока он не прекратит печатать дольше, чем 500ms.
-//       return () => {
-//         clearTimeout(handler)
-//       }
-//     },
-//     // Вызывается снова, только если значение изменится
-//     // мы так же можем добавить переменную "delay" в массива зависимостей ...
-//     // ... если вы собираетесь менять ее динамически.
-//     [value]
-//   )
-
-//   return debouncedValue
-// }
-
-// export function useDebounceFn(fn, delay) {
-//   const [call, setCall] = useState(false)
-//   useEffect(() => {
-//     const handler = setTimeout(() => {
-//       setCall(true)
-//     }, delay)
-
-//     return () => {
-//       clearTimeout(handler)
-//     }
-//   }, [fn])
-
-//   if (call) {
-//   }
-// }
+import { handleLSData, setLSDataDebounceP } from '../../helpers/helpers'
 
 const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
   idGenerator,
@@ -73,9 +23,9 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
 }) => {
   let history = useHistory()
   let { todoId } = useParams<{ todoId: string }>()
-  // let currentTodoState: TodoInitialStateT = useStore().getState().todo
   let idArr = Object.keys(todoTitles)
 
+  // Оптимизировать и убрать
   const deleteTodoHandler = (thisTodoId: string) => {
     if (todoId === thisTodoId) {
       let index = idArr.findIndex(item => item === thisTodoId)
@@ -98,9 +48,7 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
     deleteTodo(thisTodoId)
   }
 
-  // Tells< that
-  const [synchronizedWithLS, syncWithLS] = useState(false)
-
+  // Сделать переиспользуемой и вынести
   const getTodosFromServer = async () => {
     let { todoData } = await todoAPI.getTodo()
 
@@ -122,51 +70,39 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
     return Promise.resolve()
   }
 
+  // Swithces to "true" after initial LS->state sunchronization
+  // and enables LS->DB sunc if LS data changed
+  const [synchronizedWithLS, syncWithLS] = useState(false)
+
   useEffect(() => {
-    // Загружаем данные из LocalStorage в стейт после вмонтирования компоненты
+    // Fill state with LS data after initial component mount
     getTodosFromServer().then(() => {
       props.setInitialTodoData(handleLSData.get<DB_TodoDataT>('todoData'))
       syncWithLS(true)
     })
 
     return () => {
-      // let currentTodoState = currentStore.getState().todo
-      // let body = {
-      //   idGenerator: currentTodoState.idGenerator,
-      //   todoListArr: currentTodoState.todoListArr,
-      //   todoContentObj: currentTodoState.todoContentObj,
-      // }
       todoAPI.syncTodo()
       selectTodo(null)
       selectContentItem(null)
     }
   }, [])
 
-  //state changed and need to be placed in LS
+  // update LS after state change (with debouce delay)
   useEffect(() => {
     if (synchronizedWithLS) {
-      handleLSData
-        .set('todoData', {
-          idGenerator,
-          todoTitles,
-          todoContent,
-        })
-        .then(() => console.log('done'))
-
-      // delayedLSDataHandler('set', 'test', todoTitles)
-      // todoAPI.syncTodo()
+      setLSDataDebounceP('todoData', {
+        idGenerator,
+        todoTitles,
+        todoContent,
+      }).then(() => todoAPI.syncTodo())
     }
   }, [todoTitles, todoContent])
 
-  // state.currentTodoId = todoId
+  // change state.currentTodoId if url changed
   useEffect(() => {
     selectTodo(todoId)
   }, [todoId])
-
-  // //Вынести в отдельную компоненту или HOC
-  // useEffect(() => {
-  //   todoAPI.syncTodo()
-  // }, [localStorage.todoData])
 
   return (
     <>
@@ -176,7 +112,7 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
         todoTitles={todoTitles}
         selectedContentItem={selectedContentItem}
         modifyTodoContent={modifyTodoContent}
-        changeTodoTitle={props.changeTodoTitle}
+        modifyTodoTitle={props.modifyTodoTitle}
       />
       <ToDoPage
         todoId={todoId}
@@ -190,7 +126,7 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
         selectTodo={selectTodo}
         selectContentItem={selectContentItem}
         modifyTodoContent={modifyTodoContent}
-        changeTodoTitle={props.changeTodoTitle}
+        modifyTodoTitle={props.modifyTodoTitle}
         deleteTodoHandler={deleteTodoHandler}
       />
     </>
@@ -213,7 +149,7 @@ const mapDispatchToProps = {
   deleteTodoContentItem: actions.deleteTodoContentItem,
   selectTodo: actions.selectTodo,
   selectContentItem: actions.selectContentItem,
-  changeTodoTitle: actions.changeTodoTitle,
+  modifyTodoTitle: actions.modifyTodoTitle,
   modifyTodoContent: actions.modifyTodoContent,
 }
 

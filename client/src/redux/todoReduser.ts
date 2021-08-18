@@ -1,8 +1,9 @@
 // import { authAPI, AuthDataType, todoAPI } from '../api/api'
-import { ThunkAction } from 'redux-thunk'
-import { AppStateType, InferActionsTypes } from './store'
-import { LoginFormDataType } from '../pages/login/AuthPage'
-import { authActions } from './authReduser'
+// import { ThunkAction } from 'redux-thunk'
+import { InferActionsTypes } from './store'
+// import { LoginFormDataType } from '../pages/login/AuthPage'
+// import { authActions } from './authReduser'
+import { DB_TodoDataT } from '../api/api'
 
 export type TodoItemPropsT = {
   value: string
@@ -25,40 +26,7 @@ export type TodoInitialStateT = {
   currentTodoId: string | null | undefined
   selectedContentItem: number | 'title' | null
 }
-// let initialState: TodoInitialStateT = {
-//   idGenerator: 2,
-//   todoTitles: {
-//     eg_bond_todo1: {
-//       value: 'title1',
-//       color: 'black',
-//       bold: true,
-//       italic: false,
-//       underline: false,
-//     },
-//   },
-//   todoContent: {
-//     eg_bond_todo1: [
-//       {
-//         order: 0,
-//         value: 'bye bread',
-//         color: 'green',
-//         bold: false,
-//         italic: false,
-//         underline: false,
-//       },
-//       {
-//         order: 1,
-//         value: 'bye milk',
-//         color: 'red',
-//         bold: true,
-//         italic: false,
-//         underline: false,
-//       },
-//     ],
-//   },
-//   currentTodoId: null,
-//   selectedContentItem: null,
-// }
+
 let initialState: TodoInitialStateT = {
   idGenerator: 0,
   todoTitles: {},
@@ -110,10 +78,10 @@ export const todoReduser = (
 
     case 'todo/ADD_TODO_CONTENT_ITEM':
       let newContent = [
-        ...state.todoContent[String(state.currentTodoId)],
+        ...state.todoContent[state.currentTodoId!],
         {
           value: '',
-          order: state.todoContent[String(state.currentTodoId)].length,
+          order: state.todoContent[state.currentTodoId!].length,
         },
       ]
 
@@ -125,7 +93,7 @@ export const todoReduser = (
         },
       }
     case 'todo/DELETE_TODO_CONTENT_ITEM':
-      let redusedTodo = [...state.todoContent[String(state.currentTodoId)]]
+      let redusedTodo = [...state.todoContent[state.currentTodoId!]]
       redusedTodo.splice(action.order, 1)
       //упорядочиваем order
       redusedTodo.forEach((item, i) => {
@@ -136,7 +104,7 @@ export const todoReduser = (
         ...state,
         todoContent: {
           ...state.todoContent,
-          [String(state.currentTodoId)]: redusedTodo,
+          [state.currentTodoId!]: redusedTodo,
         },
       }
     case 'todo/SELECT_TODO':
@@ -151,13 +119,13 @@ export const todoReduser = (
       }
 
     //Переименовать!!
-    case 'todo/CHANGE_TODO_TITLE':
+    case 'todo/MODIFY_TODO_TITLE':
       return {
         ...state,
         todoTitles: {
           ...state.todoTitles,
-          [String(state.currentTodoId)]: {
-            ...state.todoTitles[String(state.currentTodoId)],
+          [state.currentTodoId!]: {
+            ...state.todoTitles[state.currentTodoId!],
             ...action.titleProps,
           },
         },
@@ -203,19 +171,15 @@ export const actions = {
     ({ type: 'todo/SELECT_TODO', todoId } as const),
   selectContentItem: (order: number | 'title' | null) =>
     ({ type: 'todo/SELECT_CONTENT_ITEM', order } as const),
-  changeTodoTitle: (titleProps: Object) =>
-    ({ type: 'todo/CHANGE_TODO_TITLE', titleProps } as const),
+  modifyTodoTitle: (titleProps: Object) =>
+    ({ type: 'todo/MODIFY_TODO_TITLE', titleProps } as const),
   modifyTodoContent: (itemProps: Partial<TodoItemPropsT>) =>
     ({
       type: 'todo/MODIFY_TODO_CONTENT',
       itemProps,
     } as const),
-  setInitialTodoData: (
-    todoData: Omit<
-      TodoInitialStateT,
-      'currentTodoId' | 'selectedTodoContentItem'
-    >
-  ) => ({ type: 'todo/SET_INITIAL_TODO_DATA', todoData } as const),
+  setInitialTodoData: (todoData: DB_TodoDataT) =>
+    ({ type: 'todo/SET_INITIAL_TODO_DATA', todoData } as const),
 }
 
 // type ThunkType = ThunkAction<void, AppStateType, unknown, InferredTodoActionsT>
