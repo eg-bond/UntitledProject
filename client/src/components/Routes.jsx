@@ -14,8 +14,13 @@ export const Routes = ({ isAuth }) => {
     return (
       <Switch>
         <Route path='/' exact>
-          <IndexPage />
+          <DiaryPage />
         </Route>
+
+        {/* <Route path='/' exact>
+          <IndexPage />
+        </Route> */}
+
         {/* <Route path="/todo/:todoId?"><ToDoPage/></Route> */}
         <Route path='/todo/:todoId?'>
           <ToDoPageContainer />
