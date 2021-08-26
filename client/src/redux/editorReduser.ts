@@ -27,49 +27,6 @@ let initialState = {
       ],
     },
   },
-  ch1_page0: {
-    pageContent: [
-      {
-        elem: 'p',
-        paragraphContent: [
-          { value: 'some string ', bold: false, underline: false, ...props },
-          { value: 'boldPart ', bold: true, underline: false, ...props },
-          { value: 'underlinePart ', bold: false, underline: true, ...props },
-          { value: 'normalStr ', bold: false, underline: false, ...props },
-        ],
-      },
-      {
-        elem: 'p',
-        paragraphContent: [
-          {
-            value: 'absolutely another string ',
-            bold: false,
-            underline: false,
-            ...props,
-          },
-          {
-            value: 'for checking selection ',
-            bold: true,
-            underline: false,
-            ...props,
-          },
-          { value: 'and somth ', bold: false, underline: true, ...props },
-          { value: 'asdfsdaf', bold: false, underline: false, ...props },
-        ],
-      },
-      // { elem: 'ul' },
-      // {
-      //   elem: 'p',
-      //   value: [
-      //     'some string ',
-      //     '<b>boldPart</b> ',
-      //     '<u>underlinePart</u>',
-      //     ' normalStr',
-      //   ],
-      // },
-    ],
-  },
-  ch2_page11: {
-    content: {},
-  },
+  ch1_page0: { entityMap: {}, blocks: [] },
+  ch2_page11: { entityMap: {}, blocks: [] },
 }
