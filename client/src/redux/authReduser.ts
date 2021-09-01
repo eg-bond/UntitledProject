@@ -1,6 +1,6 @@
 import { authAPI, DB_AuthDataT } from '../api/api'
 import { ThunkAction } from 'redux-thunk'
-import { AppStateType, InferActionsTypes } from './store'
+import { AppStateType } from './store'
 import { LoginFormDataType } from '../pages/login/AuthPage'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 import { Action } from 'redux'

@@ -3,7 +3,7 @@ export const handleLSData = {
     return JSON.parse(localStorage[field])
   },
   set: function (field: string, data: object) {
-    localStorage[field] = JSON.stringify({ ...data, lastUpdate: Date.now() })
+    localStorage[field] = JSON.stringify(data)
   },
 }
 

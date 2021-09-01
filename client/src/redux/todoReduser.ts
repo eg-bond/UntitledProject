@@ -1,9 +1,5 @@
-// import { authAPI, AuthDataType, todoAPI } from '../api/api'
-// import { ThunkAction } from 'redux-thunk'
-import { InferActionsTypes } from './store'
-// import { LoginFormDataType } from '../pages/login/AuthPage'
-// import { authActions } from './authReduser'
 import { DB_TodoDataT } from '../api/api'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 
 export type TodoItemPropsT = {
   value: string
@@ -25,6 +21,7 @@ export type TodoInitialStateT = {
   }
   currentTodoId: string | null | undefined
   selectedContentItem: number | 'title' | null
+  lastUpdate: number
 }
 
 let initialState: TodoInitialStateT = {
@@ -33,154 +30,82 @@ let initialState: TodoInitialStateT = {
   todoContent: {},
   currentTodoId: null,
   selectedContentItem: null,
+  lastUpdate: 0,
 }
-export const todoReduser = (
-  state = initialState,
-  action: InferredTodoActionsT
-): TodoInitialStateT => {
-  switch (action.type) {
-    case 'todo/SET_INITIAL_TODO_DATA':
-      return {
-        ...state,
-        idGenerator: action.todoData.idGenerator,
-        todoTitles: action.todoData.todoTitles,
-        todoContent: action.todoData.todoContent,
-      }
-    case 'todo/ADD_TODO':
-      return {
-        ...state,
-        idGenerator: ++state.idGenerator,
-        todoTitles: {
-          ...state.todoTitles,
-          [`eg_bond_todo${state.idGenerator}`]: {
-            value: 'Без заголовка',
-          },
-        },
-        todoContent: {
-          ...state.todoContent,
-          [`eg_bond_todo${state.idGenerator}`]: [],
-        },
-      }
-    case 'todo/DELETE_TODO':
-      let newS = {
-        ...state,
-        todoTitles: {
-          ...state.todoTitles,
-        },
-        todoContent: {
-          ...state.todoContent,
-        },
+
+const todoSlice = createSlice({
+  name: 'todo',
+  initialState,
+  reducers: {
+    setInitialTodoData: (state, action: PayloadAction<DB_TodoDataT>) => {
+      return { ...state, ...action.payload }
+    },
+    addTodo: state => {
+      state.lastUpdate += 1
+      state.idGenerator += 1
+      let newTodoKey = `eg_bond_todo${state.idGenerator}`
+
+      state.todoTitles[newTodoKey] = { value: 'Без заголовка' }
+      state.todoContent[newTodoKey] = []
+    },
+    deleteTodo: (state, action: PayloadAction<string>) => {
+      state.lastUpdate += 1
+      delete state.todoTitles[action.payload]
+      delete state.todoContent[action.payload]
+    },
+    addTodoContentItem: state => {
+      let newItem = {
+        value: '',
+        order: state.todoContent[state.currentTodoId!].length,
       }
 
-      delete newS.todoTitles[action.todoId]
-      delete newS.todoContent[action.todoId]
-      return newS
-
-    case 'todo/ADD_TODO_CONTENT_ITEM':
-      let newContent = [
-        ...state.todoContent[state.currentTodoId!],
-        {
-          value: '',
-          order: state.todoContent[state.currentTodoId!].length,
-        },
-      ]
-
-      return {
-        ...state,
-        todoContent: {
-          ...state.todoContent,
-          [String(state.currentTodoId)]: newContent,
-        },
-      }
-    case 'todo/DELETE_TODO_CONTENT_ITEM':
+      state.lastUpdate += 1
+      state.todoContent[state.currentTodoId!].push(newItem)
+    },
+    deleteTodoContentItem: (state, action: PayloadAction<number>) => {
       let redusedTodo = [...state.todoContent[state.currentTodoId!]]
-      redusedTodo.splice(action.order, 1)
+      redusedTodo.splice(action.payload, 1)
       //упорядочиваем order
       redusedTodo.forEach((item, i) => {
         item.order = i
       })
 
-      return {
-        ...state,
-        todoContent: {
-          ...state.todoContent,
-          [state.currentTodoId!]: redusedTodo,
-        },
+      state.lastUpdate += 1
+      state.todoContent[state.currentTodoId!] = redusedTodo
+    },
+    selectTodo: (state, action: PayloadAction<string | null>) => {
+      state.currentTodoId = action.payload
+    },
+    selectContentItem: (
+      state,
+      action: PayloadAction<number | 'title' | null>
+    ) => {
+      state.selectedContentItem = action.payload
+    },
+    modifyTodoTitle: (state, action: PayloadAction<object>) => {
+      state.lastUpdate += 1
+      state.todoTitles[state.currentTodoId!] = {
+        ...state.todoTitles[state.currentTodoId!],
+        ...action.payload,
       }
-    case 'todo/SELECT_TODO':
-      return {
-        ...state,
-        currentTodoId: action.todoId,
-      }
-    case 'todo/SELECT_CONTENT_ITEM':
-      return {
-        ...state,
-        selectedContentItem: action.order,
-      }
+    },
+    modifyTodoContent: (state, action: PayloadAction<TodoItemPropsT>) => {
+      let target = Number(state.selectedContentItem)
+      state.lastUpdate += 1
 
-    //Переименовать!!
-    case 'todo/MODIFY_TODO_TITLE':
-      return {
-        ...state,
-        todoTitles: {
-          ...state.todoTitles,
-          [state.currentTodoId!]: {
-            ...state.todoTitles[state.currentTodoId!],
-            ...action.titleProps,
-          },
-        },
-      }
-    case 'todo/MODIFY_TODO_CONTENT':
-      let newState = {
-        ...state,
-        todoContent: {
-          ...state.todoContent,
-        },
-      }
       if (state.selectedContentItem !== null) {
-        newState.todoContent[state.currentTodoId!][
-          Number(state.selectedContentItem)
-        ] = {
-          ...state.todoContent[state.currentTodoId!][
-            Number(state.selectedContentItem)
-          ],
-          ...action.itemProps,
+        state.todoContent[state.currentTodoId!][target] = {
+          ...state.todoContent[state.currentTodoId!][target],
+          ...action.payload,
         }
       }
+    },
+  },
+})
 
-      return newState
+export const todoActions = todoSlice.actions
 
-    default:
-      return state
-  }
-}
-
-type InferredTodoActionsT = InferActionsTypes<typeof actions>
-
-export const actions = {
-  addTodo: () => ({ type: 'todo/ADD_TODO' } as const),
-  deleteTodo: (todoId: string) =>
-    ({ type: 'todo/DELETE_TODO', todoId } as const),
-  addTodoContentItem: () =>
-    ({
-      type: 'todo/ADD_TODO_CONTENT_ITEM',
-    } as const),
-  deleteTodoContentItem: (order: number) =>
-    ({ type: 'todo/DELETE_TODO_CONTENT_ITEM', order } as const),
-  selectTodo: (todoId: string | null) =>
-    ({ type: 'todo/SELECT_TODO', todoId } as const),
-  selectContentItem: (order: number | 'title' | null) =>
-    ({ type: 'todo/SELECT_CONTENT_ITEM', order } as const),
-  modifyTodoTitle: (titleProps: Object) =>
-    ({ type: 'todo/MODIFY_TODO_TITLE', titleProps } as const),
-  modifyTodoContent: (itemProps: Partial<TodoItemPropsT>) =>
-    ({
-      type: 'todo/MODIFY_TODO_CONTENT',
-      itemProps,
-    } as const),
-  setInitialTodoData: (todoData: DB_TodoDataT) =>
-    ({ type: 'todo/SET_INITIAL_TODO_DATA', todoData } as const),
-}
+// type InferredTodoActionsT = InferActionsTypes<typeof todoActions>
 
 // type ThunkType = ThunkAction<void, AppStateType, unknown, InferredTodoActionsT>
 
@@ -196,4 +121,4 @@ export const actions = {
 //   }
 // }
 
-export default todoReduser
+export default todoSlice.reducer

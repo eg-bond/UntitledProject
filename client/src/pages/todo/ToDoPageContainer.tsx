@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from 'react'
 import { connect, ConnectedProps, useStore } from 'react-redux'
 import { AppStateType } from '../../redux/store'
-import { actions } from '../../redux/todoReduser'
+import { todoActions } from '../../redux/todoReduser'
 import { useParams, useHistory } from 'react-router-dom'
 import { DB_TodoDataT, todoAPI } from '../../api/api'
 import ToDoPage from './ToDoPage'
@@ -14,6 +14,7 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
   todoContent,
   currentTodoId,
   selectedContentItem,
+  lastUpdate,
   addTodo,
   deleteTodo,
   selectTodo,
@@ -59,7 +60,7 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
       // LS data outdated
       if (todoData.lastUpdate > lastUpdate) {
         debugger
-        handleLSData.set('todoData', todoData)
+        handleLSData.set('todoData', { ...todoData, lastUpdate: 0 })
       }
       // DB data outdated
       if (todoData.lastUpdate < lastUpdate) {
@@ -95,6 +96,7 @@ const ToDoPageContainer: React.FC<TodoReduxPropsT> = ({
         idGenerator,
         todoTitles,
         todoContent,
+        lastUpdate,
       }).then(() => todoAPI.syncTodo())
     }
   }, [todoTitles, todoContent])
@@ -140,18 +142,19 @@ const mapStateToProps = (state: AppStateType) => ({
   todoContent: state.todo.todoContent,
   currentTodoId: state.todo.currentTodoId,
   selectedContentItem: state.todo.selectedContentItem,
+  lastUpdate: state.todo.lastUpdate,
 })
 
 const mapDispatchToProps = {
-  setInitialTodoData: actions.setInitialTodoData,
-  addTodo: actions.addTodo,
-  deleteTodo: actions.deleteTodo,
-  addTodoContentItem: actions.addTodoContentItem,
-  deleteTodoContentItem: actions.deleteTodoContentItem,
-  selectTodo: actions.selectTodo,
-  selectContentItem: actions.selectContentItem,
-  modifyTodoTitle: actions.modifyTodoTitle,
-  modifyTodoContent: actions.modifyTodoContent,
+  setInitialTodoData: todoActions.setInitialTodoData,
+  addTodo: todoActions.addTodo,
+  deleteTodo: todoActions.deleteTodo,
+  addTodoContentItem: todoActions.addTodoContentItem,
+  deleteTodoContentItem: todoActions.deleteTodoContentItem,
+  selectTodo: todoActions.selectTodo,
+  selectContentItem: todoActions.selectContentItem,
+  modifyTodoTitle: todoActions.modifyTodoTitle,
+  modifyTodoContent: todoActions.modifyTodoContent,
 }
 
 const connector = connect(mapStateToProps, mapDispatchToProps)

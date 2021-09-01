@@ -4,7 +4,10 @@ import { TodoContentItem } from './TodoContentItem'
 import { TodoReduxPropsT } from './ToDoPageContainer'
 
 interface ToDoPagePropsT
-  extends Omit<TodoReduxPropsT, 'idGenerator' | 'setInitialTodoData'> {
+  extends Omit<
+    TodoReduxPropsT,
+    'idGenerator' | 'setInitialTodoData' | 'lastUpdate'
+  > {
   todoId: string
   deleteTodoHandler: (thisTodoId: string) => void
 }
