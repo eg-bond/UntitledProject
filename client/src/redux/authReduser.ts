@@ -2,6 +2,8 @@ import { authAPI, DB_AuthDataT } from '../api/api'
 import { ThunkAction } from 'redux-thunk'
 import { AppStateType, InferActionsTypes } from './store'
 import { LoginFormDataType } from '../pages/login/AuthPage'
+import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { Action } from 'redux'
 
 let initialState = {
   email: null as string | null,
@@ -14,24 +16,17 @@ let initialState = {
 
 export type AuthInitialStateType = typeof initialState
 
-export const authReduser = (
-  state = initialState,
-  action: ActionsTypes
-): AuthInitialStateType => {
-  switch (action.type) {
-    case 'SET_AUTH_DATA':
-      return {
-        ...state,
-        ...action.authData,
-        isAuth: true,
-      }
-    case 'FETCH_IN_PROGRESS':
-      return {
-        ...state,
-        isFetching: action.inProgress,
-      }
-    case 'LOGOUT':
-      localStorage.removeItem('userData')
+const authSlice = createSlice({
+  name: 'auth',
+  initialState,
+  reducers: {
+    setAuthData: (state, action: PayloadAction<DB_AuthDataT>) => {
+      return { ...state, ...action.payload, isAuth: true }
+    },
+    fetchInProgress: (state, action: PayloadAction<boolean>) => {
+      state.isFetching = action.payload
+    },
+    logout: state => {
       return {
         ...state,
         email: null,
@@ -40,33 +35,26 @@ export const authReduser = (
         nickname: null,
         isAuth: false,
       }
+    },
+  },
+})
 
-    default:
-      return state
-  }
-}
+export const { setAuthData, fetchInProgress, logout } = authSlice.actions
 
-type ActionsTypes = InferActionsTypes<typeof authActions>
-type ThunkType = ThunkAction<Promise<void>, AppStateType, unknown, ActionsTypes>
-
-export const authActions = {
-  fetchInProgress: (inProgress: boolean) =>
-    ({ type: 'FETCH_IN_PROGRESS', inProgress } as const),
-  setAuthData: (authData: DB_AuthDataT) =>
-    ({ type: 'SET_AUTH_DATA', authData } as const),
-  logout: () => ({ type: 'LOGOUT' } as const),
-}
+type ThunkType = ThunkAction<Promise<void>, AppStateType, unknown, Action>
 
 export const getAuthData = (token: string): ThunkType => {
   return async dispatch => {
-    dispatch(authActions.fetchInProgress(true))
+    dispatch(fetchInProgress(true))
+
     let responseData = await authAPI.me(token)
     if (responseData.statusCode === 0) {
-      dispatch(authActions.setAuthData(responseData.authData))
+      dispatch(setAuthData(responseData.authData))
     } else {
       localStorage.removeItem('userData')
     }
-    dispatch(authActions.fetchInProgress(false))
+
+    dispatch(fetchInProgress(false))
   }
 }
 
@@ -75,18 +63,15 @@ export const login = (formData: LoginFormDataType): ThunkType => {
     let responseData = await authAPI.login(formData)
 
     if (responseData.statusCode === 0) {
-      localStorage.setItem(
-        'userData',
-        JSON.stringify({ token: responseData.token })
-      )
-
-      dispatch(authActions.setAuthData(responseData.authData))
+      localStorage.userData = JSON.stringify({ token: responseData.token })
+      dispatch(setAuthData(responseData.authData))
     } else {
       if (window.M && responseData.message) {
-        window.M.toast({ html: responseData.message }) //.toast это метод Материалайза, который выводит плашку с текстом на экран
+        //.toast это метод Материалайза, который выводит плашку с текстом на экран
+        window.M.toast({ html: responseData.message })
       }
     }
   }
 }
 
-export default authReduser
+export default authSlice.reducer

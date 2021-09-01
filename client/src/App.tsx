@@ -1,7 +1,7 @@
 import React, { useEffect } from 'react'
 import './App.css'
 import { connect } from 'react-redux'
-import { getAuthData, authActions } from './redux/authReduser'
+import { getAuthData, logout } from './redux/authReduser'
 import { Loader } from './components/Loader'
 import 'materialize-css'
 import Navbar from './components/Navbar'
@@ -62,6 +62,6 @@ const mapStateToProps = (state: AppStateType): mapStateToPropsType => ({
 })
 
 export default connect(mapStateToProps, {
-  logout: authActions.logout,
+  logout,
   getAuthData,
 })(App)
