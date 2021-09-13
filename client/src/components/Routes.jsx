@@ -5,7 +5,7 @@ import AuthPage from '../pages/login/AuthPage'
 import { Redirect, Route, Switch } from 'react-router-dom'
 import ToDoPage from '../pages/todo/ToDoPage'
 // import ToDoPageWithLocalContent from "../pages/todo/ToDoPageWithLocalContent";
-import DiaryPage from '../pages/diary/DiaryPage'
+import EditorPage from '../pages/editor/EditorPage'
 import ToDoPageContainer from '../pages/todo/ToDoPageContainer'
 import TodoToolbar from './TodoToolbar'
 
@@ -14,7 +14,7 @@ export const Routes = ({ isAuth }) => {
     return (
       <Switch>
         <Route path='/' exact>
-          <DiaryPage />
+          <EditorPage />
         </Route>
 
         {/* <Route path='/' exact>
@@ -25,8 +25,8 @@ export const Routes = ({ isAuth }) => {
         <Route path='/todo/:todoId?'>
           <ToDoPageContainer />
         </Route>
-        <Route path='/diary'>
-          <DiaryPage />
+        <Route path='/editor'>
+          <EditorPage />
         </Route>
         <Redirect to='/' exact />
       </Switch>

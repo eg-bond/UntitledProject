@@ -1,8 +1,10 @@
 import { configureStore, combineReducers } from '@reduxjs/toolkit'
+import { reducer as formReducer } from 'redux-form'
 import authReduser from './authReduser'
 import todoReduser from './todoReduser'
 
 let rootReducer = combineReducers({
+  form: formReducer,
   auth: authReduser,
   todo: todoReduser,
 })
