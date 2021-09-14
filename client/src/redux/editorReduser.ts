@@ -1,5 +1,6 @@
 import { DB_TodoDataT } from '../api/api'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { log } from 'console'
 
 // export type TodoItemPropsT = {
 //   value: string
@@ -9,20 +10,20 @@ import { createSlice, PayloadAction } from '@reduxjs/toolkit'
 //   italic?: boolean
 //   underline?: boolean
 // }
-// export type TodoTitlePropsT = Omit<TodoItemPropsT, 'order'>
+export type EditorChaptersT = {
+  [key: string]: {
+    title: string
+    pages: { [key: string]: { title: string } }
+    // pages: Array<{ title: string; id: string }>
+  }
+}
 
 export type EditorInitialStateT = {
   chapterIdGen: number
   pagesIdGen: number
   currentChapter: string
   currentPage: string
-  chapters: {
-    [key: string]: {
-      title: string
-      pages: { [key: string]: { title: string } }
-      // pages: Array<{ title: string; id: string }>
-    }
-  }
+  chapters: EditorChaptersT
   pagesData: {
     [key: string]: { entityMap: {}; blocks: [] }
   }
@@ -30,8 +31,8 @@ export type EditorInitialStateT = {
 }
 
 let initialState: EditorInitialStateT = {
-  chapterIdGen: 5,
-  pagesIdGen: 5,
+  chapterIdGen: 3,
+  pagesIdGen: 50,
   currentChapter: '',
   currentPage: '',
   lastUpdate: 0,
@@ -44,16 +45,16 @@ let initialState: EditorInitialStateT = {
       //   { title: 'titlep3', id: 'ch1_page6' },
       // ],
       pages: {
-        ch1_page0: { title: 'titlep1' },
-        ch1_page2: { title: 'titlep2' },
-        ch1_page6: { title: 'titlep3' },
+        chapter1_page0: { title: 'titlep1' },
+        chapter1_page2: { title: 'titlep2' },
+        chapter1_page6: { title: 'titlep3' },
       },
     },
     chapter2: {
       title: 'chapter2',
       pages: {
-        ch2_page23: { title: 'asdf' },
-        ch2_page11: { title: 'titlep2' },
+        chapter2_page23: { title: 'asdf' },
+        chapter2_page11: { title: 'titlep2' },
       },
       // pages: [
       //   { title: 'asdf', id: 'ch2_page23' },
@@ -63,8 +64,8 @@ let initialState: EditorInitialStateT = {
     chapter3: {
       title: 'chapter3',
       pages: {
-        ch3_page13: { title: 'aaaaaaaaa' },
-        ch3_page111: { title: 'titlep233' },
+        chapter3_page13: { title: 'aaaaaaaaa' },
+        chapter3_page111: { title: 'titlep233' },
       },
       // pages: [
       //   { title: 'aaaaaaaaa', id: 'ch3_page13' },
@@ -73,8 +74,8 @@ let initialState: EditorInitialStateT = {
     },
   },
   pagesData: {
-    ch1_page0: { entityMap: {}, blocks: [] },
-    ch2_page11: { entityMap: {}, blocks: [] },
+    chapter1_page0: { entityMap: {}, blocks: [] },
+    chapter2_page11: { entityMap: {}, blocks: [] },
   },
 }
 
@@ -88,17 +89,21 @@ const editorSlice = createSlice({
     addChapter: state => {
       state.lastUpdate += 1
       state.chapterIdGen += 1
-      let newChapterKey = 'ch' + state.chapterIdGen
+      state.pagesIdGen += 1
+
+      let newChapterKey = 'chapter' + state.chapterIdGen
+      state.currentChapter = newChapterKey
+      state.currentPage = newChapterKey + '_page' + state.pagesIdGen
 
       state.chapters[newChapterKey] = {
         title: 'chapter' + newChapterKey,
-        pages: {},
+        pages: { [state.currentPage]: { title: 'without title' } },
       }
     },
     deleteChapter: (state, action: PayloadAction<string>) => {
       state.lastUpdate += 1
       let chapterKeys = Object.keys(state.chapters)
-      if (chapterKeys.length === 0) {
+      if (chapterKeys.length === 1) {
         state.currentChapter = ''
         state.currentPage = ''
       } else {
@@ -108,12 +113,50 @@ const editorSlice = createSlice({
         } else {
           state.currentChapter = chapterKeys[chapterIndex - 1]
         }
-        state.currentPage = ''
+        state.currentPage = Object.keys(
+          state.chapters[state.currentChapter].pages
+        )[0]
       }
       delete state.chapters[action.payload]
     },
+    modifyChapterTitle: (
+      state,
+      action: PayloadAction<{ chapterId: string; title: string }>
+    ) => {
+      state.lastUpdate += 1
+      state.chapters[action.payload.chapterId].title = action.payload.title
+    },
     selectChapter: (state, action: PayloadAction<string>) => {
       state.currentChapter = action.payload
+      state.currentPage = Object.keys(
+        state.chapters[state.currentChapter].pages
+      )[0]
+    },
+    addPage: state => {
+      state.lastUpdate += 1
+      state.pagesIdGen += 1
+
+      let newPageKey = state.currentChapter + '_page' + state.pagesIdGen
+      state.currentPage = newPageKey
+
+      state.chapters[state.currentChapter].pages[newPageKey] = {
+        title: 'without title',
+      }
+    },
+    deletePage: (state, action: PayloadAction<string>) => {
+      state.lastUpdate += 1
+      let pagesKeys = Object.keys(state.chapters[state.currentChapter].pages)
+      if (pagesKeys.length === 1) {
+        state.currentPage = ''
+      } else {
+        let pageIndex = pagesKeys.findIndex(k => k == action.payload)
+        if (pageIndex === 0) {
+          state.currentPage = pagesKeys[pageIndex + 1]
+        } else {
+          state.currentPage = pagesKeys[pageIndex - 1]
+        }
+      }
+      delete state.chapters[state.currentChapter].pages[action.payload]
     },
     selectPage: (state, action: PayloadAction<string>) => {
       state.currentPage = action.payload
