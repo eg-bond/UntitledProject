@@ -27,9 +27,7 @@ export const TodoContentItem: React.FC<ContentItemPropsT> = ({
   }
 
   const blurHandler = () => {
-    modifyTodoContent({
-      value: localValue,
-    })
+    modifyTodoContent({ value: localValue, order })
     switchFocus(false)
   }
 

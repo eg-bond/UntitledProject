@@ -1,16 +1,21 @@
+html {
+  --navbarHeight: 5vh;
+}
+
 .navbar {
-    padding: 10px 6px;
-    background-color: violet;
-    display: flex;
-    justify-content: space-between;
+  height: var(--navbarHeight);
+  padding: 10px 6px;
+  background-color: violet;
+  display: flex;
+  justify-content: space-between;
 }
 
 .navbar__segment {
-    background-color: orange;
-    display: flex;
-    justify-content: space-between;
+  background-color: orange;
+  display: flex;
+  justify-content: space-between;
 }
 
 .navbar__item {
-    margin: 0 10px;
+  margin: 0 10px;
 }

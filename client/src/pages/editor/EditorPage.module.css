@@ -1,0 +1,50 @@
+.container {
+  --toolbarHeight: 5vh;
+  --columnsWidth: 25vw;
+}
+
+.columns {
+  position: absolute;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  width: var(--columnsWidth);
+  margin-top: var(--toolbarHeight);
+  height: calc(100vh - var(--toolbarHeight) - var(--navbarHeight));
+}
+
+.columns__chapters {
+  display: flex;
+  flex-direction: column;
+}
+
+.title {
+  position: absolute;
+  z-index: 2;
+  width: calc(100vw - var(--columnsWidth));
+  margin-left: var(--columnsWidth);
+  margin-top: var(--toolbarHeight);
+  height: 3vh;
+  background-color: rgb(18, 196, 107);
+}
+
+.editor {
+  position: absolute;
+  width: 100vw;
+}
+
+.editor__toolbar {
+  height: var(--toolbarHeight);
+
+  background-color: orange;
+  padding: 0 !important;
+  margin-bottom: 0 !important;
+  border: none !important;
+}
+
+.editor__textarea {
+  height: calc(100vh - var(--toolbarHeight) - var(--navbarHeight));
+  background-color: cornflowerblue;
+  margin-top: 3vh;
+  margin-left: var(--columnsWidth);
+}
