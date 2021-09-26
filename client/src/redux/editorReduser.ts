@@ -1,6 +1,5 @@
 import { DB_TodoDataT } from '../api/api'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
-import { log } from 'console'
 
 // export type TodoItemPropsT = {
 //   value: string
@@ -25,7 +24,7 @@ export type EditorInitialStateT = {
   currentPage: string
   chapters: EditorChaptersT
   pagesData: {
-    [key: string]: { entityMap: {}; blocks: [] }
+    [key: string]: { entityMap: object; blocks: Array<object> }
   }
   lastUpdate: number
 }
@@ -39,43 +38,15 @@ let initialState: EditorInitialStateT = {
   chapters: {
     chapter1: {
       title: 'chapter1',
-      // pages: [
-      //   { title: 'titlep1', id: 'ch1_page0' },
-      //   { title: 'titlep2', id: 'ch1_page2' },
-      //   { title: 'titlep3', id: 'ch1_page6' },
-      // ],
       pages: {
         chapter1_page0: { title: 'titlep1' },
         chapter1_page2: { title: 'titlep2' },
-        chapter1_page6: { title: 'titlep3' },
       },
-    },
-    chapter2: {
-      title: 'chapter2',
-      pages: {
-        chapter2_page23: { title: 'asdf' },
-        chapter2_page11: { title: 'titlep2' },
-      },
-      // pages: [
-      //   { title: 'asdf', id: 'ch2_page23' },
-      //   { title: 'titlep2', id: 'ch2_page11' },
-      // ],
-    },
-    chapter3: {
-      title: 'chapter3',
-      pages: {
-        chapter3_page13: { title: 'aaaaaaaaa' },
-        chapter3_page111: { title: 'titlep233' },
-      },
-      // pages: [
-      //   { title: 'aaaaaaaaa', id: 'ch3_page13' },
-      //   { title: 'titlep233', id: 'ch3_page111' },
-      // ],
     },
   },
   pagesData: {
     chapter1_page0: { entityMap: {}, blocks: [] },
-    chapter2_page11: { entityMap: {}, blocks: [] },
+    // chapter2_page2: { entityMap: {}, blocks: [] },
   },
 }
 
@@ -142,6 +113,7 @@ const editorSlice = createSlice({
       state.chapters[state.currentChapter].pages[newPageKey] = {
         title: 'without title',
       }
+      localStorage[newPageKey] = JSON.stringify({ entityMap: {}, blocks: [] })
     },
     deletePage: (state, action: PayloadAction<string>) => {
       state.lastUpdate += 1
@@ -167,15 +139,13 @@ const editorSlice = createSlice({
         action.payload
     },
 
-    // addTodoContentItem: state => {
-    //   let newItem = {
-    //     value: '',
-    //     order: state.todoContent[state.currentTodoId!].length,
-    //   }
-
-    //   state.lastUpdate += 1
-    //   state.todoContent[state.currentTodoId!].push(newItem)
-    // },
+    modifyPageData: (
+      state,
+      action: PayloadAction<{ entityMap: object; blocks: Array<object> }>
+    ) => {
+      state.lastUpdate += 1
+      state.pagesData[state.currentPage] = action.payload
+    },
     // deleteTodoContentItem: (state, action: PayloadAction<number>) => {
     //   let redusedTodo = [...state.todoContent[state.currentTodoId!]]
     //   redusedTodo.splice(action.payload, 1)

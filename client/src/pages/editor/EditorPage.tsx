@@ -11,6 +11,7 @@ import {
   EditorChapters,
   EditorTitle,
 } from './EditorPageComponents'
+import { debug } from 'console'
 
 // action creators
 export const {
@@ -22,28 +23,13 @@ export const {
   addPage,
   deletePage,
   modifyChapterTitle,
+  modifyPageData,
 } = editorActions
 
-const content = localStorage['DraftEditor-state']
-  ? JSON.parse(localStorage['DraftEditor-state'])
-  : { entityMap: {}, blocks: [] }
+// 1. Insert pagesData from Redux based on currentPage
+// - If there is no such page in Redux - receive from server
 
 function EditorPage() {
-  let [editorState, setEditorState] = useState(
-    EditorState.createWithContent(convertFromRaw(content))
-  )
-
-  // debounse
-  useEffect(() => {
-    const timeout = setTimeout(() => {
-      localStorage['DraftEditor-state'] = JSON.stringify(
-        convertToRaw(editorState.getCurrentContent())
-      )
-    }, 1000)
-
-    return () => clearTimeout(timeout)
-  }, [editorState])
-
   const d = useAppDispatch()
   // selectors
   const chapters = useAppSelector(state => state.editor.chapters)
@@ -52,8 +38,50 @@ function EditorPage() {
   const currentPageTitle = useAppSelector(state => {
     return chapters[currentChapter]?.pages[currentPage]?.title || ''
   })
+  const currentPageData = useAppSelector(state => {
+    return state.editor.pagesData[currentPage]
+  })
 
-  // console.log(currentPageTitle)
+  // Выбираем первую главу при монтировании компоненты
+  useEffect(() => {
+    d(selectChapter(Object.keys(chapters)[0]))
+  }, [])
+
+  //----------------------------------------------------------
+  let [content, setContent] = useState({ entityMap: {}, blocks: [] })
+  let [editorState, setEditorState] = useState(
+    EditorState.createWithContent(convertFromRaw(content))
+  )
+
+  useEffect(() => {
+    if (!currentPage) {
+      setContent({ entityMap: {}, blocks: [] })
+    } else if (currentPageData) {
+      setContent(currentPageData)
+      setEditorState(
+        EditorState.createWithContent(convertFromRaw(currentPageData))
+      )
+    } else {
+      let cont = JSON.parse(localStorage[currentPage])
+      setContent(cont)
+      setEditorState(EditorState.createWithContent(convertFromRaw(cont)))
+    }
+  }, [currentPage])
+
+  console.log(content)
+
+  // debounse
+  useEffect(() => {
+    const timeout = setTimeout(() => {
+      localStorage[currentPage] = JSON.stringify(
+        convertToRaw(editorState.getCurrentContent())
+      )
+      d(modifyPageData(convertToRaw(editorState.getCurrentContent())))
+    }, 1000)
+
+    return () => clearTimeout(timeout)
+  }, [editorState])
+  //----------------------------------------------------------
 
   return (
     <div className={s.container}>
