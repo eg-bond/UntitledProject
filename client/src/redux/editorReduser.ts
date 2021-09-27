@@ -1,5 +1,6 @@
 import { DB_TodoDataT } from '../api/api'
 import { createSlice, PayloadAction } from '@reduxjs/toolkit'
+import { RawDraftContentBlock, RawDraftContentState } from 'draft-js'
 
 // export type TodoItemPropsT = {
 //   value: string
@@ -24,7 +25,7 @@ export type EditorInitialStateT = {
   currentPage: string
   chapters: EditorChaptersT
   pagesData: {
-    [key: string]: { entityMap: object; blocks: Array<object> }
+    [key: string]: RawDraftContentState
   }
   lastUpdate: number
 }
@@ -45,7 +46,7 @@ let initialState: EditorInitialStateT = {
     },
   },
   pagesData: {
-    chapter1_page0: { entityMap: {}, blocks: [] },
+    // chapter1_page0: { entityMap: {}, blocks: [] },
     // chapter2_page2: { entityMap: {}, blocks: [] },
   },
 }
@@ -138,44 +139,10 @@ const editorSlice = createSlice({
       state.chapters[state.currentChapter].pages[state.currentPage].title =
         action.payload
     },
-
-    modifyPageData: (
-      state,
-      action: PayloadAction<{ entityMap: object; blocks: Array<object> }>
-    ) => {
+    modifyPageData: (state, action: PayloadAction<RawDraftContentState>) => {
       state.lastUpdate += 1
       state.pagesData[state.currentPage] = action.payload
     },
-    // deleteTodoContentItem: (state, action: PayloadAction<number>) => {
-    //   let redusedTodo = [...state.todoContent[state.currentTodoId!]]
-    //   redusedTodo.splice(action.payload, 1)
-    //   //упорядочиваем order
-    //   redusedTodo.forEach((item, i) => {
-    //     item.order = i
-    //   })
-
-    //   state.lastUpdate += 1
-    //   state.todoContent[state.currentTodoId!] = redusedTodo
-    // },
-
-    // selectContentItem: (
-    //   state,
-    //   action: PayloadAction<number | 'title' | null>
-    // ) => {
-    //   state.selectedContentItem = action.payload
-    // },
-
-    // modifyTodoContent: (state, action: PayloadAction<TodoItemPropsT>) => {
-    //   let target = Number(state.selectedContentItem)
-    //   state.lastUpdate += 1
-
-    //   if (state.selectedContentItem !== null) {
-    //     state.todoContent[state.currentTodoId!][target] = {
-    //       ...state.todoContent[state.currentTodoId!][target],
-    //       ...action.payload,
-    //     }
-    //   }
-    // },
   },
 })
 

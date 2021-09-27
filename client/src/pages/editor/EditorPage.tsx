@@ -1,4 +1,4 @@
-import React, { useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useState } from 'react'
 import { EditorState, convertToRaw, convertFromRaw } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
@@ -11,7 +11,7 @@ import {
   EditorChapters,
   EditorTitle,
 } from './EditorPageComponents'
-import { debug } from 'console'
+import useUpdateEffect from '../../hooks/useUpdateEffect'
 
 // action creators
 export const {
@@ -48,35 +48,31 @@ function EditorPage() {
   }, [])
 
   //----------------------------------------------------------
-  let [content, setContent] = useState({ entityMap: {}, blocks: [] })
-  let [editorState, setEditorState] = useState(
-    EditorState.createWithContent(convertFromRaw(content))
-  )
+  let [editorState, setEditorState] = useState(EditorState.createEmpty())
+  // let [stateContent, setStateContent] = useState(
+  //   convertToRaw(editorState.getCurrentContent())
+  // )
 
-  useEffect(() => {
-    if (!currentPage) {
-      setContent({ entityMap: {}, blocks: [] })
-    } else if (currentPageData) {
-      setContent(currentPageData)
+  // inserting pagesData from server or Redux state
+  useUpdateEffect(() => {
+    if (currentPageData) {
       setEditorState(
         EditorState.createWithContent(convertFromRaw(currentPageData))
       )
     } else {
       let cont = JSON.parse(localStorage[currentPage])
-      setContent(cont)
       setEditorState(EditorState.createWithContent(convertFromRaw(cont)))
     }
   }, [currentPage])
 
-  console.log(content)
-
-  // debounse
-  useEffect(() => {
+  // update redux pagesData state and send data to server (with debounce 1000)
+  useUpdateEffect(() => {
+    let stateData = convertToRaw(editorState.getCurrentContent())
     const timeout = setTimeout(() => {
-      localStorage[currentPage] = JSON.stringify(
-        convertToRaw(editorState.getCurrentContent())
-      )
-      d(modifyPageData(convertToRaw(editorState.getCurrentContent())))
+      localStorage[currentPage] = JSON.stringify(stateData)
+      if (JSON.stringify(stateData) !== JSON.stringify(currentPageData)) {
+        d(modifyPageData(stateData))
+      }
     }, 1000)
 
     return () => clearTimeout(timeout)
