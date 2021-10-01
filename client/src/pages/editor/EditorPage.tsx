@@ -1,4 +1,4 @@
-import React, { useCallback, useEffect, useState } from 'react'
+import React, { useCallback, useEffect, useRef, useState } from 'react'
 import { EditorState, convertToRaw, convertFromRaw } from 'draft-js'
 import { Editor } from 'react-draft-wysiwyg'
 import 'react-draft-wysiwyg/dist/react-draft-wysiwyg.css'
@@ -12,6 +12,7 @@ import {
   EditorTitle,
 } from './EditorPageComponents'
 import useUpdateEffect from '../../hooks/useUpdateEffect'
+import usePrevious from '../../hooks/usePrevious'
 
 // action creators
 export const {
@@ -49,17 +50,23 @@ function EditorPage() {
 
   //----------------------------------------------------------
   let [editorState, setEditorState] = useState(EditorState.createEmpty())
+  let [stateForDB, setStateDB] = useState({})
+  const prevCurrentPage = usePrevious(currentPage)
+
   // let [stateContent, setStateContent] = useState(
   //   convertToRaw(editorState.getCurrentContent())
   // )
 
   // inserting pagesData from server or Redux state
   useUpdateEffect(() => {
+    // console.log('current page effect')
+
     if (currentPageData) {
       setEditorState(
         EditorState.createWithContent(convertFromRaw(currentPageData))
       )
     } else {
+      // !!!UPD 1 - заменить экшеном getCurrentPageData
       let cont = JSON.parse(localStorage[currentPage])
       setEditorState(EditorState.createWithContent(convertFromRaw(cont)))
     }
@@ -68,15 +75,34 @@ function EditorPage() {
   // update redux pagesData state and send data to server (with debounce 1000)
   useUpdateEffect(() => {
     let stateData = convertToRaw(editorState.getCurrentContent())
+
+    if (JSON.stringify(stateData) !== JSON.stringify(currentPageData)) {
+      d(modifyPageData(stateData))
+    }
+  }, [editorState])
+
+  useEffect(() => {
     const timeout = setTimeout(() => {
+      let stateData = convertToRaw(editorState.getCurrentContent())
+      // console.log('DB')
       localStorage[currentPage] = JSON.stringify(stateData)
-      if (JSON.stringify(stateData) !== JSON.stringify(currentPageData)) {
-        d(modifyPageData(stateData))
-      }
     }, 1000)
 
     return () => clearTimeout(timeout)
-  }, [editorState])
+  }, [currentPageData])
+
+  useUpdateEffect(() => {
+    console.log('curr: ' + currentPage)
+    console.log('prev: ' + prevCurrentPage)
+    setStateDB(convertToRaw(editorState.getCurrentContent()))
+    console.log(convertToRaw(editorState.getCurrentContent()))
+    const timeout = setTimeout(() => {
+      console.log('DB')
+      localStorage[currentPage + '_test'] = JSON.stringify(stateForDB)
+    }, 1000)
+
+    return () => clearTimeout(timeout)
+  }, [currentPageData])
   //----------------------------------------------------------
 
   return (
